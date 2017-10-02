@@ -2,7 +2,6 @@ package repositories
 
 import javax.inject.{Inject, Singleton}
 
-import com.github.nscala_time.time.Imports._
 import models.Account
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
@@ -17,7 +16,7 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
   import dbConfig._
   import profile.api._
 
-  private class AccountTable(tag: Tag) extends Table[Account](tag, "account") {
+  private class AccountTable(tag: Tag) extends Table[Account](tag, "Account") {
 
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 

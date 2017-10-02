@@ -9,8 +9,9 @@ import play.api.libs.json.Json._
 case class Report(id: Long,
                   lesson: Lesson,
                   student: Account,
-                  incident: String,
+                  title: String,
                   date: Timestamp,
+                  isResolved: Boolean,
                   description: String)
 
 object Report {

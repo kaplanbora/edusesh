@@ -10,6 +10,7 @@ import play.api.libs.json.Json._
 case class Transaction(id: Long,
                        lesson: Lesson,
                        student: Account,
+                       price: Int,
                        date: Timestamp)
 
 object Transaction {

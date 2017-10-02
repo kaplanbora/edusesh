@@ -10,6 +10,7 @@ import play.api.libs.json.Json._
 case class Message(id: Long,
                    sender: Account,
                    receiver: Account,
+                   conversation: Conversation,
                    body: String,
                    date: Timestamp)
 

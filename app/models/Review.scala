@@ -11,6 +11,7 @@ case class Review(id: Long,
                   student: Account,
                   rating: Double,
                   date: Timestamp,
+                  title: String,
                   comment: String)
 
 object Review {

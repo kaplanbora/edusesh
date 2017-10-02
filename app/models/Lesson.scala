@@ -10,8 +10,9 @@ import play.api.libs.json.Json._
 // Price should be type Money and duration should be type Duration
 case class Lesson(id: Long,
                   teacher: Account,
-                  price: Int,
                   category: Category,
+                  name: String,
+                  price: Int,
                   duration: Int,
                   creationDate: Timestamp,
                   description: String,

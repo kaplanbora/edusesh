@@ -18,7 +18,7 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
   private class CategoryTable(tag: Tag) extends Table[Category](tag, "category") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    def name = column[String]("name")
+    def name = column[String]("name", O.Unique)
 
     def * = (id, name) <> ((Category.apply _).tupled, Category.unapply)
   }
@@ -39,7 +39,7 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     * Create a new category in database
     *
     * @param name Category name
-    * @return Generated id of the category
+    * @return Category object
     */
   def create(name: String): Future[Category] = db.run {
     (categories.map(c => c.name)
