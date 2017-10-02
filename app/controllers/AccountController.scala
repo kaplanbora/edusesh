@@ -8,6 +8,7 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.Constraints._
 
+import play.api.libs.Crypto
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, ControllerComponents}
@@ -37,6 +38,8 @@ class AccountController @Inject()(accountRepo: AccountRepository, cc: Controller
   //      (JsPath / "first-name").read[String] and
   //      (JsPath / "last-name").read[String]
   //    ) (AccountForm.apply _)
+
+
 
   def currentTime: Timestamp = Timestamp.valueOf(LocalDateTime.now())
 

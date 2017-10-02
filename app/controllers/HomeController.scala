@@ -25,11 +25,4 @@ class HomeController @Inject()(repo: CategoryRepository, cc: MessagesControllerC
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def createCategory(name: String) = Action.async { implicit request =>
-    repo.create(name).map(id => Ok(Json.toJson(id)))
-  }
-
-  def listCategories = Action.async { implicit request =>
-    repo.list().map(x => Ok(Json.toJson(x)))
-  }
 }

@@ -15,7 +15,7 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
   import dbConfig._
   import profile.api._
 
-  private class CategoryTable(tag: Tag) extends Table[Category](tag, "category") {
+  private class CategoryTable(tag: Tag) extends Table[Category](tag, "Category") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
     def name = column[String]("name", O.Unique)
@@ -26,7 +26,7 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
   private val categories = TableQuery[CategoryTable]
 
   /**
-    * List all categories
+    * List all categories.
     *
     * @return Sequence of categories
     */
@@ -34,6 +34,18 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
     categories.result
   }
 
+  /**
+    * Get a category via its id.
+    *
+    * @param id Id of the category
+    * @return Category option
+    */
+  def get(id: Long): Future[Option[Category]] = db.run {
+    categories
+      .filter(_.id === id)
+      .result
+      .headOption
+  }
 
   /**
     * Create a new category in database
@@ -46,5 +58,18 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
       returning categories.map(_.id)
       into ((name, id) => Category(id, name))
       ) += name
+  }
+
+  /**
+    * Update a categories name.
+    *
+    * @param name New name to put.
+    * @return Id of the object
+    */
+  def update(id: Long, name: String): Future[Int] = db.run {
+    categories
+      .filter(_.id === id)
+      .map(_.name)
+      .update(name)
   }
 }
