@@ -1,18 +1,29 @@
 package models
 
-import play.api.libs.json.{Format, Json, Reads, Writes}
-import com.github.nscala_time.time.Imports._
+import java.sql.Timestamp
+import java.time.LocalDateTime
+
+import play.api.libs.json._
+import play.api.libs.json.Json._
 
 case class Review(id: Long,
                   lesson: Lesson,
                   student: Account,
                   rating: Double,
-                  date: DateTime,
+                  date: Timestamp,
                   comment: String)
 
 object Review {
-  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-  implicit val dateFormat = Format[DateTime](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
+  def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime
+
+  def dateTimeToTimestamp(ldt: LocalDateTime): Timestamp = Timestamp.valueOf(ldt)
+
+  implicit val timestampFormat = new Format[Timestamp] {
+    def writes(t: Timestamp): JsValue = toJson(timestampToDateTime(t))
+
+    def reads(json: JsValue): JsResult[Timestamp] = fromJson[LocalDateTime](json).map(dateTimeToTimestamp)
+  }
+
   implicit val reviewFormat = Json.format[Review]
 }
 

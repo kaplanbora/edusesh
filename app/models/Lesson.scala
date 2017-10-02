@@ -1,10 +1,11 @@
 package models
 
-import com.github.nscala_money.money.Imports._
-import com.github.nscala_time.time.Imports._
-import play.api.libs.json.{Format, Json, Reads, Writes}
+import java.time.LocalDateTime
+import java.sql.Timestamp
 
-import scala.concurrent.duration.Duration
+import play.api.libs.json._
+import play.api.libs.json.Json._
+
 
 // Price should be type Money and duration should be type Duration
 case class Lesson(id: Long,
@@ -12,13 +13,20 @@ case class Lesson(id: Long,
                   price: Int,
                   category: Category,
                   duration: Int,
-                  creationDate: DateTime,
+                  creationDate: Timestamp,
                   description: String,
                   isActive: Boolean)
 
 object Lesson {
-  val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-  Money.formatted("")
-  implicit val dateFormat = Format[DateTime](Reads.jodaDateReads(pattern), Writes.jodaDateWrites(pattern))
+  def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime
+
+  def dateTimeToTimestamp(ldt: LocalDateTime): Timestamp = Timestamp.valueOf(ldt)
+
+  implicit val timestampFormat = new Format[Timestamp] {
+    def writes(t: Timestamp): JsValue = toJson(timestampToDateTime(t))
+
+    def reads(json: JsValue): JsResult[Timestamp] = fromJson[LocalDateTime](json).map(dateTimeToTimestamp)
+  }
+
   implicit val lessonFormat = Json.format[Lesson]
 }
