@@ -4,14 +4,14 @@ import javax.inject.{Inject, Singleton}
 
 import models.Account
 import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.JdbcProfile
+import slick.jdbc.PostgresProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 import java.sql.Timestamp
 
 @Singleton
 class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  private val dbConfig = dbConfigProvider.get[PostgresProfile]
 
   import dbConfig._
   import profile.api._
@@ -32,7 +32,8 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
 
     def userType = column[String]("user_type")
 
-    def * = (id, email, password, firstName, lastName, creationDate, userType).mapTo[Account]
+    def * = (id, email, password, firstName, lastName, creationDate, userType) <>
+      ((Account.apply _).tupled, Account.unapply)
   }
 
   private val accounts = TableQuery[AccountTable]
@@ -55,5 +56,11 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
       .map(a => (a.email, a.password, a.firstName, a.lastName))
       .update((email, password, firstName, lastName))
       .transactionally
+  }
+
+  def delete(id: Long): Future[Int] = db.run {
+    accounts
+      .filter(_.id === id)
+      .delete
   }
 }

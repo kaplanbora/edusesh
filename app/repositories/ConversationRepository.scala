@@ -2,15 +2,15 @@ package repositories
 
 import javax.inject.{Inject, Singleton}
 
-import models.{Account, Conversation}
+import models.Conversation
 import play.api.db.slick.DatabaseConfigProvider
-import slick.jdbc.JdbcProfile
+import slick.jdbc.PostgresProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ConversationRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  private val dbConfig = dbConfigProvider.get[JdbcProfile]
+  private val dbConfig = dbConfigProvider.get[PostgresProfile]
 
   import dbConfig._
   import profile.api._
@@ -22,11 +22,7 @@ class ConversationRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)
 
     def account2Id = column[Long]("account2_id")
 
-    def * = (id, account1Id, account2Id).mapTo[Conversation]
-
-    def account1 = foreignKey("conversationAccountFK1", account1Id, TableQuery[Account])(_.id)
-
-    def account2 = foreignKey("conversationAccountFK2", account2Id, TableQuery[Account])(_.id)
+    def * = (id, account1Id, account2Id) <> ((Conversation.apply _).tupled, Conversation.unapply)
   }
 
   private val conversations = TableQuery[ConversationTable]

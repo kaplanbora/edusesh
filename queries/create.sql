@@ -37,12 +37,11 @@ CREATE TABLE "Conversation" (
 
 CREATE TABLE "Lesson" (
   "id"           BIGSERIAL,
-  "teacher_id"   BIGINT       NOT NULL,
-  "category_id"  BIGINT       NOT NULL,
-  "name"         VARCHAR(200) NOT NULL,
-  "price"        INT          NOT NULL,
-  "duration"     INT,
-  "creationDate" TIMESTAMP    NOT NULL,
+  "teacher_id"   BIGINT           NOT NULL,
+  "category_id"  BIGINT           NOT NULL,
+  "name"         VARCHAR(200)     NOT NULL,
+  "price"        DOUBLE PRECISION NOT NULL,
+  "creationDate" TIMESTAMP        NOT NULL,
   "description"  TEXT,
   "is_active"    BOOLEAN DEFAULT TRUE,
   CONSTRAINT "lessonPK" PRIMARY KEY ("id"),

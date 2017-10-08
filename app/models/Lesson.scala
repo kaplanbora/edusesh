@@ -7,13 +7,12 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 
 
-// Price should be type Money and duration should be type Duration
+// Price is calculated hourly
 case class Lesson(id: Long,
-                  teacher: Account,
-                  category: Category,
+                  teacherId: Long,
+                  categoryId: Long,
                   name: String,
-                  price: Int,
-                  duration: Int,
+                  price: Double,
                   creationDate: Timestamp,
                   description: String,
                   isActive: Boolean)
