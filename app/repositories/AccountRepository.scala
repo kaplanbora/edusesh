@@ -32,8 +32,7 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
 
     def userType = column[String]("user_type")
 
-    def * = (id, email, password, firstName, lastName, creationDate, userType) <>
-      ((Account.apply _).tupled, Account.unapply)
+    def * = (id, email, password, firstName, lastName, creationDate, userType).mapTo[Account]
   }
 
   private val accounts = TableQuery[AccountTable]
@@ -43,11 +42,18 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
   }
 
   def create(email: String, password: String, firstName: String,
-             lastName: String, creationDate: Timestamp, userType: String): Future[Account] = db.run {
+      lastName: String, creationDate: Timestamp, userType: String): Future[Account] = db.run {
     (accounts.map(a => (a.email, a.password, a.firstName, a.lastName, a.creationDate, a.userType))
       returning accounts.map(_.id)
       into ((values, id) => Account(id, values._1, values._2, values._3, values._4, values._5, values._6))
       ) += (email, password, firstName, lastName, creationDate, userType)
   }
 
+  def update(id: Long, email: String, password: String, firstName: String, lastName: String): Future[Int] = db.run {
+    accounts
+      .filter(_.id === id)
+      .map(a => (a.email, a.password, a.firstName, a.lastName))
+      .update((email, password, firstName, lastName))
+      .transactionally
+  }
 }

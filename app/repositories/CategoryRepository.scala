@@ -20,7 +20,7 @@ class CategoryRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(imp
 
     def name = column[String]("name", O.Unique)
 
-    def * = (id, name) <> ((Category.apply _).tupled, Category.unapply)
+    def * = (id, name).mapTo[Category]
   }
 
   private val categories = TableQuery[CategoryTable]
