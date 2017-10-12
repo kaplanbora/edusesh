@@ -8,10 +8,10 @@ import play.api.libs.json.Json._
 
 
 case class Transaction(id: Long,
-                       lesson: Lesson,
-                       student: Account,
-                       price: Int,
-                       date: Timestamp)
+                       lessonId: Long,
+                       studentId: Long,
+                       price: Double,
+                       date: Timestamp) extends Model
 
 object Transaction {
   def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime

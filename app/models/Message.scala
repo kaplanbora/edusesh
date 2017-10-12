@@ -8,9 +8,9 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 
 case class Message(id: Long,
-                   sender: Account,
-                   receiver: Account,
-                   conversation: Conversation,
+                   senderId: Long,
+                   receiverId: Long,
+                   conversationId: Long,
                    body: String,
                    date: Timestamp)
 

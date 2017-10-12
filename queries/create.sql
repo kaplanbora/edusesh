@@ -119,10 +119,10 @@ CREATE TABLE "Review" (
 
 CREATE TABLE "Transaction" (
   "id"         BIGSERIAL,
-  "lesson_id"  BIGINT    NOT NULL,
-  "student_id" BIGINT    NOT NULL,
-  "price"      INT       NOT NULL,
-  "date"       TIMESTAMP NOT NULL,
+  "lesson_id"  BIGINT           NOT NULL,
+  "student_id" BIGINT           NOT NULL,
+  "price"      DOUBLE PRECISION NOT NULL,
+  "date"       TIMESTAMP        NOT NULL,
   CONSTRAINT "transactionPK" PRIMARY KEY ("id"),
   CONSTRAINT "transactionLessonFK" FOREIGN KEY ("lesson_id")
   REFERENCES "Lesson" ("id")

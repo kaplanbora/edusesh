@@ -7,8 +7,8 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 
 case class Report(id: Long,
-                  lesson: Lesson,
-                  student: Account,
+                  lessonId: Long,
+                  studentId: Long,
                   title: String,
                   date: Timestamp,
                   isResolved: Boolean,

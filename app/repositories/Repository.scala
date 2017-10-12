@@ -10,7 +10,7 @@ abstract class ModelTable[T](tag: Tag, name: String) extends Table[T](tag, name)
 
 trait Repository[C <: ModelTable[T], T] {
   protected val table: TableQuery[C]
-  protected val db = Database.forConfig("")
+  protected val db = Database.forConfig("default")
 
   def list(): Future[Seq[C#TableElementType]] = db.run {
     table.result
@@ -23,9 +23,16 @@ trait Repository[C <: ModelTable[T], T] {
       .headOption
   }
 
-  def delete(id: Long): Future[Int]
+  def delete(id: Long): Future[Int] = db.run {
+    table
+      .filter(_.id === id)
+      .delete
+  }
 
-  //  private val queryById = Compiled((id: Rep[Int]) => table.filter(_.id === id))
+  def create: Future[T]
+  def update: Future[Int]
+
+//    private val queryById = Compiled((id: Rep[Int]) => table.filter(_.id === id))
   //
   //  def all: Future[Seq[C#TableElementType]] = db.run(table.result)
   //
@@ -35,5 +42,5 @@ trait Repository[C <: ModelTable[T], T] {
   //
   //  def update(id: Int, c: C#TableElementType): Future[Int] = db.run(queryById(id).update(c))
   //
-  //  def delete(id: Int): Future[Int] = db.run(queryById(id).delete)
+//    def delete(id: Int): Future[Int] = db.run(queryById(id).delete)
 }
