@@ -6,8 +6,6 @@ import java.sql.Timestamp
 import play.api.libs.json._
 import play.api.libs.json.Json._
 
-
-// Price is calculated hourly
 case class Lesson(id: Long,
                   teacherId: Long,
                   categoryId: Long,
