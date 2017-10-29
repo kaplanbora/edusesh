@@ -13,10 +13,11 @@ import scala.concurrent.ExecutionContext
  * It is used below by the `map` method.
  */
 @Singleton
-class ExampleFilter @Inject()(implicit ec: ExecutionContext) extends EssentialFilter {
+class GlobalFilter @Inject()(implicit ec: ExecutionContext) extends EssentialFilter {
   override def apply(next: EssentialAction) = EssentialAction { request =>
     next(request).map { result =>
       result.withHeaders("Access-Control-Allow-Origin" -> "*")
+      result.withHeaders("Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE")
     }
   }
 }

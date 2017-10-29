@@ -7,12 +7,13 @@ import java.time.LocalDateTime
 import play.api.libs.json._
 import play.api.libs.json.Json._
 
-case class Message(id: Long,
-                   senderId: Long,
-                   receiverId: Long,
-                   conversationId: Long,
-                   body: String,
-                   date: Timestamp)
+case class Message(
+    id: Long,
+    senderId: Long,
+    receiverId: Long,
+    conversationId: Long,
+    body: String,
+    date: Timestamp)
 
 object Message {
   def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime

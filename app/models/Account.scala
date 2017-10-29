@@ -7,7 +7,8 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 
 
-case class Account(id: Long,
+case class Account(
+    id: Long,
     email: String,
     password: String,
     firstName: String,

@@ -6,13 +6,14 @@ import java.time.LocalDateTime
 import play.api.libs.json._
 import play.api.libs.json.Json._
 
-case class Review(id: Long,
-                  lessonId: Long,
-                  studentId: Long,
-                  rating: Double,
-                  date: Timestamp,
-                  title: String,
-                  comment: String)
+case class Review(
+    id: Long,
+    lessonId: Long,
+    studentId: Long,
+    rating: Double,
+    date: Timestamp,
+    title: String,
+    comment: String)
 
 object Review {
   def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime

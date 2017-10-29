@@ -6,14 +6,15 @@ import java.sql.Timestamp
 import play.api.libs.json._
 import play.api.libs.json.Json._
 
-case class Lesson(id: Long,
-                  teacherId: Long,
-                  categoryId: Long,
-                  name: String,
-                  price: Double,
-                  creationDate: Timestamp,
-                  description: String,
-                  isActive: Boolean)
+case class Lesson(
+    id: Long,
+    teacherId: Long,
+    categoryId: Long,
+    name: String,
+    price: Double,
+    creationDate: Timestamp,
+    description: String,
+    isActive: Boolean)
 
 object Lesson {
   def timestampToDateTime(t: Timestamp): LocalDateTime = t.toLocalDateTime

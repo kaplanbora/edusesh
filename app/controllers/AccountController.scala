@@ -10,8 +10,10 @@ import repositories.AccountRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AccountController @Inject()(accountRepo: AccountRepository, cc: ControllerComponents)
-                                 (implicit ec: ExecutionContext) extends AbstractController(cc) {
+class AccountController @Inject()(
+    accountRepo: AccountRepository,
+    cc: ControllerComponents)
+  (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   case class AccountForm(email: String, password: String, firstName: String, lastName: String)
 
