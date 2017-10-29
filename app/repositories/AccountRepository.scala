@@ -63,4 +63,11 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
       .filter(_.id === id)
       .delete
   }
+
+  def byEmail(email: String): Future[Option[Account]] = db.run {
+    accounts
+      .filter(_.email === email)
+      .result
+      .headOption
+  }
 }
