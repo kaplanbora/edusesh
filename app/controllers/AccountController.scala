@@ -30,7 +30,13 @@ class AccountController @Inject()(
       },
       account => {
         accountRepo
-          .create(account.email, encodePassword(account.password), account.firstName, account.lastName, currentTime, "student")
+          .create(
+            account.email,
+            encodePassword(account.password, account.email),
+            account.firstName,
+            account.lastName,
+            currentTime,
+            "student")
           .map(account => Created(Json.obj("account" -> Json.toJson(account))))
       }
     )
