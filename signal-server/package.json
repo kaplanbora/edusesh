@@ -1,0 +1,10 @@
+{
+  "name": "signal-server",
+  "version": "0.1",
+  "description": "Signalling server to connect clients on WebRTC with websockets.",
+  "author": "Bora Kaplan",
+  "dependencies": {
+    "webrtc-adapter": "^1.4.0",
+    "websocket": "^1.0.25"
+  }
+}
