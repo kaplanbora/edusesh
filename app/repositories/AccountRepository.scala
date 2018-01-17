@@ -50,11 +50,19 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
       ) += (email, password, firstName, lastName, creationDate, userType)
   }
 
-  def update(id: Long, email: String, password: String, firstName: String, lastName: String): Future[Int] = db.run {
+  def updateProfile(id: Long, firstName: String, lastName: String): Future[Int] = db.run {
     accounts
       .filter(_.id === id)
-      .map(a => (a.email, a.password, a.firstName, a.lastName))
-      .update((email, password, firstName, lastName))
+      .map(a => (a.firstName, a.lastName))
+      .update((firstName, lastName))
+      .transactionally
+  }
+
+  def updateCredentials(id: Long, email: String, password: String): Future[Int] = db.run {
+    accounts
+      .filter(_.id === id)
+      .map(a => (a.email, a.password))
+      .update((email, password))
       .transactionally
   }
 
@@ -64,9 +72,16 @@ class AccountRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(impl
       .delete
   }
 
-  def byEmail(email: String): Future[Option[Account]] = db.run {
+  def findByEmail(email: String): Future[Option[Account]] = db.run {
     accounts
       .filter(_.email === email)
+      .result
+      .headOption
+  }
+
+  def findById(id: Long): Future[Option[Account]] = db.run {
+    accounts
+      .filter(_.id === id)
       .result
       .headOption
   }

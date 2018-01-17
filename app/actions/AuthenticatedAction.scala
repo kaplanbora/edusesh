@@ -12,9 +12,11 @@ import play.api.mvc.Results._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedAction @Inject()(parser: BodyParsers.Default)
-  (implicit ec: ExecutionContext) extends ActionBuilderImpl(parser) {
-  override def invokeBlock[A](request: Request[A], block: (Request[A]) => Future[Result]) = {
+class UserRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
+
+class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
+  (implicit ec: ExecutionContext) extends ActionBuilder[UserRequest, AnyContent] {
+  def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]) = {
     val userId = for {
       token <- request.headers.get("JWT")
       jwt <- Token.validate(token)
@@ -24,7 +26,7 @@ class AuthenticatedAction @Inject()(parser: BodyParsers.Default)
     userId match {
       case Some(id) =>
         Logger.info(s"[${readableDate(ZonedDateTime.now())}] - Successful authentication for user: $id")
-        block(request)
+        block(new UserRequest(id, request))
       case _ =>
         Logger.info(s"[${readableDate(ZonedDateTime.now())}] - Authentication error for request: ${request.body} ${request.headers}")
         Future.successful(Forbidden(Json.obj("error" -> "Authentication Error")))
@@ -33,4 +35,8 @@ class AuthenticatedAction @Inject()(parser: BodyParsers.Default)
 
   def readableDate(date: ZonedDateTime) =
     s"${date.getYear}-${date.getMonthValue}-${date.getDayOfMonth} ${date.getHour}:${date.getMinute}"
+
+  override def parser: BodyParser[AnyContent] = bodyParser
+
+  override protected def executionContext: ExecutionContext = ec
 }
