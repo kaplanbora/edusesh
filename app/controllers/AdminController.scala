@@ -7,6 +7,7 @@ import javax.inject.Inject
 import auth.Security.encodePassword
 import actions.AuthorizedAction
 import forms.AccountForm
+import forms.AccountForms._
 import play.api.libs.json._
 import play.api.mvc._
 import repositories.AccountRepository
@@ -42,4 +43,10 @@ class AdminController @Inject()(
       }
     )
   }
+
+  def delete(id: Long) = adminAction.async { implicit request =>
+    accountRepo.delete(id)
+      .map(_ => Ok(Json.obj("deleted" -> true)))
+  }
+
 }

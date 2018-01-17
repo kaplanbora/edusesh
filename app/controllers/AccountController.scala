@@ -98,6 +98,11 @@ class AccountController @Inject()(
     )
   }
 
+  def delete = authAction.async { implicit request =>
+    accountRepo.delete(request.userId)
+      .map(_ => Ok(Json.obj("deleted" -> true)))
+  }
+
   def login = Action(parse.json).async { implicit request =>
     request.body.validate[LoginForm].fold(
       errors => {

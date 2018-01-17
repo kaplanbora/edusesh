@@ -3,20 +3,22 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file              controllers.Assets.versioned(path="/public", file: Asset)
 
-GET         /cats                      controllers.CategoryController.list
-GET         /cats/:id                  controllers.CategoryController.get(id: Int)
-POST        /cats                      controllers.CategoryController.create
-PUT         /cats/:id                  controllers.CategoryController.update(id: Int)
+GET           /cats                      controllers.CategoryController.list
+GET           /cats/:id                  controllers.CategoryController.get(id: Int)
+POST          /cats                      controllers.CategoryController.create
+PUT           /cats/:id                  controllers.CategoryController.update(id: Int)
 
-PUT         /users/credentials         controllers.AccountController.updateCredentials
-PUT         /users/profile             controllers.AccountController.updateProfile
-GET         /users/profile             controllers.AccountController.getOwnProfile
-GET         /users/profile/:id         controllers.AccountController.getProfile(id: Long)
-POST        /registerTrainee           controllers.AccountController.registerTrainee
-POST        /registerInstructor        controllers.AccountController.registerInstructor
-POST        /login                     controllers.AccountController.login
+PUT           /users/credentials         controllers.AccountController.updateCredentials
+PUT           /users/profile             controllers.AccountController.updateProfile
+GET           /users/profile             controllers.AccountController.getOwnProfile
+GET           /users/profile/:id         controllers.AccountController.getProfile(id: Long)
+DELETE        /users                     controllers.AccountController.delete
+POST          /registerTrainee           controllers.AccountController.registerTrainee
+POST          /registerInstructor        controllers.AccountController.registerInstructor
+POST          /login                     controllers.AccountController.login
 
-GET         /admin/users               controllers.AdminController.getAccounts
-POST        /admin/register            controllers.AdminController.register
+GET           /admin/users               controllers.AdminController.getAccounts
+DELETE        /admin/users/:id           controllers.AdminController.delete(id: Long)
+POST          /admin/register            controllers.AdminController.register
