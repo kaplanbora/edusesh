@@ -24,7 +24,7 @@ class AccountController @Inject()(
 
   def currentTime = Timestamp.valueOf(LocalDateTime.now())
 
-  def register = Action(parse.json).async { implicit request =>
+  def registerTrainee = Action(parse.json).async { implicit request =>
     request.body.validate[AccountForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
@@ -36,7 +36,25 @@ class AccountController @Inject()(
           account.firstName,
           account.lastName,
           currentTime,
-          "student"
+          "trainee"
+        ).map(account => Created(Json.obj("account" -> Json.toJson(account))))
+      }
+    )
+  }
+
+  def registerInstructor = Action(parse.json).async { implicit request =>
+    request.body.validate[AccountForm].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+      },
+      account => {
+        accountRepo.create(
+          account.email,
+          encodePassword(account.password, account.email),
+          account.firstName,
+          account.lastName,
+          currentTime,
+          "instructor"
         ).map(account => Created(Json.obj("account" -> Json.toJson(account))))
       }
     )
