@@ -17,6 +17,5 @@ GET         /users/profile/:id        controllers.AccountController.getProfile(i
 POST        /register                 controllers.AccountController.register
 POST        /login                    controllers.AccountController.login
 
-
 GET         /admin/users              controllers.AdminController.getAccounts
 POST        /admin/register           controllers.AdminController.register

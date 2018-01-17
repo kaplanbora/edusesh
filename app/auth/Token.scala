@@ -32,6 +32,6 @@ object Token extends Logger {
       Security.tokenKey,         // The key to validate the signature against
       Algorithm.HS256,           // The algorithm we require
       Set(Typ),                  // The set of headers we require (excluding alg)
-      Set(Sub, UserRole, Exp),   // The set of claims we require
+      Set(Sub, UserRole, Exp)   // The set of claims we require
     ).toOption
 }
