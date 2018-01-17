@@ -27,7 +27,6 @@ class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
 
     userId match {
       case Some(id) =>
-        Logger.info(s"[$readableDate] - Successful authentication for user: $id")
         block(new UserRequest(id, request))
       case _ =>
         Logger.info(s"[$readableDate] - Authentication error for request: ${request.body} ${request.headers}")
