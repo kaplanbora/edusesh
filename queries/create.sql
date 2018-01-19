@@ -12,7 +12,7 @@ CREATE TABLE "user_credentials" (
   "email"         TEXT      NOT NULL UNIQUE,
   "password"      TEXT      NOT NULL,
   "creation_date" TIMESTAMP NOT NULL,
-  "user_type"     TEXT      NOT NULL
+  "user_role"     TEXT      NOT NULL
 );
 
 CREATE TABLE "instructor_profiles" (
@@ -22,7 +22,7 @@ CREATE TABLE "instructor_profiles" (
   "description" TEXT,
   "occupation"  TEXT,
   "image_link"  TEXT,
-  "hourly_rate" DOUBLE PRECISION,
+  "hourly_rate" DOUBLE PRECISION DEFAULT 0,
   "video_link"  TEXT,
   "user_id"     BIGINT NOT NULL UNIQUE,
   CONSTRAINT "profilesCredentialsFK" FOREIGN KEY ("user_id")
