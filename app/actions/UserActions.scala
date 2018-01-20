@@ -17,6 +17,7 @@ class InstructorRequest[A](val userId: Long, request: Request[A]) extends Wrappe
 class TraineeRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
 
 // Validates the request for an existing user with any role.
+// TODO: Check if this user exists in database.
 class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
   (implicit ec: ExecutionContext) extends ActionBuilder[AuthenticatedRequest, AnyContent] {
   def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) = {

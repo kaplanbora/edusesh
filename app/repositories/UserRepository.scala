@@ -117,7 +117,7 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
       .result
   }
 
-  def createUser(form: UserRegisterForm, userRole: UserRole, creationDate: LocalDateTime): Future[Long] = db.run {
+  def createUser(form: UserCredentialsForm, userRole: UserRole, creationDate: LocalDateTime): Future[Long] = db.run {
     (userCredentials returning userCredentials.map(_.id)) +=
       UserCredentials(-1, form.email, encodePassword(form.password, form.email), creationDate, userRole)
   }
@@ -135,7 +135,7 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
   def updateCredentials(userId: Long, form: UserCredentialsForm): Future[Int] = db.run {
     userCredentials.filter(_.id === userId)
       .map(credentials => (credentials.email, credentials.password))
-      .update((form.email, form.password))
+      .update((form.email, encodePassword(form.password, form.email)))
       .transactionally
   }
 

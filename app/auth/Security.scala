@@ -1,6 +1,6 @@
 package auth
 
-import models.Account
+import models.UserCredentials
 import java.security.MessageDigest
 
 object Security {
@@ -19,7 +19,7 @@ object Security {
       .map("%02x".format(_)).mkString
   }
 
-  def checkPassword(password: String, account: Account): Boolean = {
-    account.password.equals(encodePassword(password, account.email))
+  def checkPassword(password: String, user: UserCredentials): Boolean = {
+    user.password.equals(encodePassword(password, user.email))
   }
 }
