@@ -78,8 +78,19 @@ class UserController @Inject()(
     )
   }
 
-  def getOwnProfile = authAction.async { implicit request =>
-    request.userRole match {
+  def getSelfCredentials = authAction.async { implicit request =>
+    Future.successful(Ok(Json.toJson(request.credentials)))
+  }
+
+  def getCredentials(id: Long) = Action.async { implicit request =>
+    userRepo.getCredentialsById(id).map {
+      case Some(credentials) => Ok(Json.toJson(credentials))
+      case None => BadRequest(Json.obj("error" -> "User not found."))
+    }
+  }
+
+  def getSelfProfile = authAction.async { implicit request =>
+    request.credentials.userRole match {
       case InstructorRole => userRepo.getInstructorProfile(request.userId)
           .map(instructor => Ok(Json.toJson(instructor)))
       case TraineeRole =>  userRepo.getTraineeProfile(request.userId)

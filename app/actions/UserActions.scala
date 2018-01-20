@@ -12,21 +12,22 @@ import repositories.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedRequest[A](val userId: Long, val userRole: UserRole, request: Request[A]) extends WrappedRequest[A](request)
+class AuthenticatedRequest[A](val userId: Long, val credentials: UserCredentials, request: Request[A]) extends WrappedRequest[A](request)
 class InstructorRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
 class TraineeRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
 
 // Validates the request for an existing user with any role.
-// TODO: Check if this user exists in database.
-class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
+class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default, userRepo: UserRepository)
   (implicit ec: ExecutionContext) extends ActionBuilder[AuthenticatedRequest, AnyContent] {
-  def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) = {
 
+  def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) = {
     val userDetails = extractTokenInfo(request)
 
     userDetails match {
-      case Some((id, role)) =>
-        block(new AuthenticatedRequest(id, toUserRole(role), request))
+      case Some((id, _)) => userRepo.getCredentialsById(id).flatMap {
+        case Some(credentials) => block(new AuthenticatedRequest(id, credentials, request))
+        case None => Future.successful(Forbidden(Json.obj("error" -> "User not found.")))
+      }
       case _ =>
         logBadRequests(request, "Authentication error.")
         Future.successful(Forbidden(Json.obj("error" -> "Authentication Error")))
@@ -40,8 +41,8 @@ class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
 // Validates the request for only instructors
 class InstructorAction @Inject()(bodyParser: BodyParsers.Default, userRepo: UserRepository)
   (implicit ec: ExecutionContext) extends ActionBuilder[InstructorRequest, AnyContent] {
-  def invokeBlock[A](request: Request[A], block: InstructorRequest[A] => Future[Result]) = {
 
+  def invokeBlock[A](request: Request[A], block: InstructorRequest[A] => Future[Result]) = {
     val userDetails = extractTokenInfo(request)
 
     userDetails match {
@@ -62,8 +63,8 @@ class InstructorAction @Inject()(bodyParser: BodyParsers.Default, userRepo: User
 // Validates the request for only trainees
 class TraineeAction @Inject()(bodyParser: BodyParsers.Default, userRepo: UserRepository)
   (implicit ec: ExecutionContext) extends ActionBuilder[TraineeRequest, AnyContent] {
-  def invokeBlock[A](request: Request[A], block: TraineeRequest[A] => Future[Result]) = {
 
+  def invokeBlock[A](request: Request[A], block: TraineeRequest[A] => Future[Result]) = {
     val userDetails = extractTokenInfo(request)
 
     userDetails match {

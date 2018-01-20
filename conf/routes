@@ -13,7 +13,9 @@ PUT           /cats/:id                       controllers.CategoryController.upd
 POST          /login                          controllers.UserController.login
 POST          /registerTrainee                controllers.UserController.registerTrainee
 POST          /registerInstructor             controllers.UserController.registerInstructor
-GET           /users/profile                  controllers.UserController.getOwnProfile
+GET           /users/credentials              controllers.UserController.getSelfCredentials
+GET           /users/credentials/:id          controllers.UserController.getCredentials(id: Long)
+GET           /users/profile                  controllers.UserController.getSelfProfile
 GET           /users/profile/:id              controllers.UserController.getProfile(id: Long)
 PUT           /users/instructorProfile        controllers.UserController.updateInstructorProfile
 PUT           /users/traineeProfile           controllers.UserController.updateTraineeProfile
