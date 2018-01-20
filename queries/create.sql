@@ -84,7 +84,7 @@ CREATE TABLE "messages" (
   "sender_id"       BIGINT    NOT NULL,
   "receiver_id"     BIGINT    NOT NULL,
   "conversation_id" BIGINT    NOT NULL,
-  "body"            TEXT,
+  "body"            TEXT      NOT NULL,
   "date"            TIMESTAMP NOT NULL,
   CONSTRAINT "messageAccountFK1" FOREIGN KEY ("sender_id")
   REFERENCES "user_credentials" ("id")
@@ -162,7 +162,8 @@ CREATE TABLE "reviews" (
 CREATE TABLE "session_files" (
   "id"         BIGSERIAL PRIMARY KEY,
   "session_id" BIGINT NOT NULL,
-  "file_link"  TEXT   NOT NULL,
+  "name"       TEXT   NOT NULL,
+  "link"       TEXT   NOT NULL,
   CONSTRAINT "sessionFilesFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")
   ON DELETE CASCADE
