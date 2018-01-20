@@ -7,7 +7,7 @@ import play.api.libs.json._
 abstract class UserRole(val role: String)
 case object AdminRole extends UserRole("admin")
 case object InstructorRole extends UserRole("instructor")
-case object TraineeRole extends UserRole("instructor")
+case object TraineeRole extends UserRole("trainee")
 
 case class UserCredentials(
     id: Long,
