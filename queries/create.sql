@@ -1,12 +1,3 @@
-DROP TABLE "Conversation";
-DROP TABLE "Message";
-DROP TABLE "Report";
-DROP TABLE "Review";
-DROP TABLE "Transaction";
-DROP TABLE "Lesson";
-DROP TABLE "Category";
-DROP TABLE "Account";
-
 CREATE TABLE "user_credentials" (
   "id"            BIGSERIAL PRIMARY KEY,
   "email"         TEXT      NOT NULL UNIQUE,
@@ -27,6 +18,16 @@ CREATE TABLE "instructor_profiles" (
   "user_id"     BIGINT NOT NULL UNIQUE,
   CONSTRAINT "profilesCredentialsFK" FOREIGN KEY ("user_id")
   REFERENCES "user_credentials" ("id")
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
+);
+
+CREATE TABLE "topics" (
+  "id"        BIGSERIAL PRIMARY KEY,
+  "name"      TEXT   NOT NULL UNIQUE,
+  "parent_id" BIGINT NOT NULL,
+  CONSTRAINT "topicsTopicsFK" FOREIGN KEY ("parent_id")
+  REFERENCES "topics" ("id")
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
@@ -57,17 +58,6 @@ CREATE TABLE "trainee_profiles" (
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
-
-CREATE TABLE "topics" (
-  "id"        BIGSERIAL PRIMARY KEY,
-  "name"      TEXT   NOT NULL UNIQUE,
-  "parent_id" BIGINT NOT NULL,
-  CONSTRAINT "topicsTopicsFK" FOREIGN KEY ("parent_id")
-  REFERENCES "topics" ("id")
-  ON DELETE CASCADE
-  ON UPDATE CASCADE
-);
-
 
 CREATE TABLE "conversations" (
   "id"       BIGSERIAL PRIMARY KEY,
@@ -177,7 +167,6 @@ CREATE TABLE "reviews" (
   "title"      TEXT             NOT NULL,
   "comment"    TEXT,
   "date"       TIMESTAMP        NOT NULL,
-  CONSTRAINT "reviewPK" PRIMARY KEY ("id"),
   CONSTRAINT "reviewsSessionsFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")
   ON DELETE NO ACTION
@@ -196,4 +185,4 @@ CREATE TABLE "session_files" (
   REFERENCES "sessions" ("id")
   ON DELETE CASCADE
   ON UPDATE CASCADE
-)
+);

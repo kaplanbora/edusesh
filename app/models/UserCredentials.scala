@@ -1,6 +1,7 @@
 package models
 
 import java.time.LocalDateTime
+
 import play.api.libs.json._
 
 abstract class UserRole(val role: String)
@@ -20,14 +21,14 @@ object UserCredentials {
   import forms.TimestampFormats._
 
   implicit object userRoleFormat extends Format[UserRole] {
-    def reads(json: JsValue) = (json \ "userRole").get.as[String] match {
-      case "admin" => JsSuccess(AdminRole)
-      case "instructor" => JsSuccess(InstructorRole)
-      case "trainee" => JsSuccess(TraineeRole)
+    def reads(json: JsValue) = json match {
+      case JsString("admin") => JsSuccess(AdminRole)
+      case JsString("instructor") => JsSuccess(InstructorRole)
+      case JsString("trainee") => JsSuccess(TraineeRole)
       case _ => JsError("Unknown user role.")
     }
 
-    def writes(userRole: UserRole) = Json.obj("userRole" -> userRole.role)
+    def writes(userRole: UserRole) = JsString(userRole.role)
   }
 
   def toUserRole(role: String) = role match {

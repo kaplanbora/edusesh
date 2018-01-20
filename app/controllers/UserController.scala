@@ -6,7 +6,9 @@ import javax.inject.Inject
 import actions._
 import auth.{Security, Token}
 import forms._
+import forms.UserForms._
 import models._
+import models.InstructorProfile._
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, ControllerComponents}
 import repositories.UserRepository
@@ -22,6 +24,21 @@ class UserController @Inject()(
   (implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def currentTime = LocalDateTime.now()
+
+  def login = Action(parse.json).async { implicit request =>
+    request.body.validate[UserCredentialsForm].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+      },
+      credentials => {
+        userRepo.getCredentialsByEmail(credentials.email).map {
+          case Some(user) if Security.checkPassword(credentials.password, user) =>
+            Ok(Json.obj("token" -> Token.generate(user)))
+          case _ => BadRequest(Json.obj("error" -> "No match for this email and password."))
+        }
+      }
+    )
+  }
 
   def registerTrainee = Action(parse.json).async { implicit request =>
     request.body.validate[UserCredentialsForm].fold(
@@ -62,13 +79,11 @@ class UserController @Inject()(
   }
 
   def getOwnProfile = authAction.async { implicit request =>
-    val profile = request.userRole match {
+    request.userRole match {
       case InstructorRole => userRepo.getInstructorProfile(request.userId)
+          .map(instructor => Ok(Json.toJson(instructor)))
       case TraineeRole =>  userRepo.getTraineeProfile(request.userId)
-    }
-    profile.map {
-      case Some(user) => Ok(Json.toJson(user))
-      case None => NotFound(Json.obj("error" -> "User not found."))
+          .map(trainee => Ok(Json.toJson(trainee)))
     }
   }
 
@@ -121,21 +136,6 @@ class UserController @Inject()(
   def delete = authAction.async { implicit request =>
     userRepo.deleteUser(request.userId)
       .map(lines => Ok(Json.obj("deleted" -> lines)))
-  }
-
-  def login = Action(parse.json).async { implicit request =>
-    request.body.validate[UserCredentialsForm].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-      },
-      credentials => {
-        userRepo.getCredentialsByEmail(credentials.email).map {
-          case Some(user) if Security.checkPassword(credentials.password, user) =>
-            Ok(Json.obj("token" -> Token.generate(user)))
-          case _ => BadRequest(Json.obj("error" -> "No match for this email and password."))
-        }
-      }
-    )
   }
 }
 

@@ -2,7 +2,6 @@ package auth
 
 import io.igl.jwt._
 import models.UserCredentials
-import util.Logger
 import java.time.ZonedDateTime
 
 import play.api.libs.json._
@@ -17,7 +16,7 @@ object Role extends (String => Role) with ClaimField {
   override val name: String = "role"
 }
 
-object Token extends Logger {
+object Token {
   def generate(user: UserCredentials): String =
     new DecodedJwt(
       Seq(Alg(Algorithm.HS256), Typ("JWT")),
