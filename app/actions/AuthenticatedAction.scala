@@ -3,8 +3,10 @@ package actions
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-import auth.Token
+import auth.{Role, Token}
 import io.igl.jwt.Sub
+import models._
+import models.UserCredentials.toUserRole
 import play.api.Logger
 import play.api.libs.json._
 import play.api.mvc._
@@ -12,22 +14,24 @@ import play.api.mvc.Results._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UserRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
+class UserRequest[A](val userId: Long, val userRole: UserRole, request: Request[A]) extends WrappedRequest[A](request)
 
 class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default)
-  (implicit ec: ExecutionContext) extends ActionBuilder[UserRequest, AnyContent] {
-  def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]) = {
+  (implicit ec: ExecutionContext) extends ActionBuilder[AuthenticatedRequest, AnyContent] {
+  def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) = {
     implicit lazy val now = ZonedDateTime.now()
 
-    val userId = for {
+    val userDetails = for {
       token <- request.headers.get("JWT")
       jwt <- Token.validate(token)
       sub <- jwt.getClaim[Sub]
-    } yield sub.value.toLong
+      role <- jwt.getClaim[Role]
+    } yield (sub.value.toLong, role.value)
 
-    userId match {
-      case Some(id) =>
-        block(new UserRequest(id, request))
+
+    userDetails match {
+      case Some((id, role)) =>
+        block(new AuthenticatedRequest(id, toUserRole(role), request))
       case _ =>
         Logger.info(s"[$readableDate] - Authentication error for request: ${request.body} ${request.headers}")
         Future.successful(Forbidden(Json.obj("error" -> "Authentication Error")))

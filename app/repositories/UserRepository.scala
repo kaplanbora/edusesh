@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
 import forms._
+import auth.Security.encodePassword
 import models._
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.PostgresProfile
@@ -116,22 +117,17 @@ class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implici
       .result
   }
 
-  def createUser(form: UserRegisterForm, creationDate: LocalDateTime): Future[Long] = db.run {
+  def createUser(form: UserRegisterForm, userRole: UserRole, creationDate: LocalDateTime): Future[Long] = db.run {
     (userCredentials returning userCredentials.map(_.id)) +=
-      UserCredentials(-1, form.email, form.password, creationDate, form.userRole)
-    // In controller:
-    //    form.userRole match {
-    //      case InstructorRole => createInstructorProfile(userId, creationDate)
-    //      case TraineeRole => createTraineeProfile(userId, creationDate)
-    //    }
+      UserCredentials(-1, form.email, encodePassword(form.password, form.email), creationDate, userRole)
   }
 
-  def createInstructorProfile(userId: Long, creationDate: LocalDateTime): Future[Long] = db.run {
+  def createInstructorProfile(userId: Long): Future[Long] = db.run {
     (instructorProfiles returning instructorProfiles.map(_.id)) +=
       InstructorProfile(-1, None, None, None, None, None, None, 0, userId)
   }
 
-  def createTraineeProfile(userId: Long, creationDate: LocalDateTime): Future[Long] = db.run {
+  def createTraineeProfile(userId: Long): Future[Long] = db.run {
     (traineeProfiles returning traineeProfiles.map(_.id)) +=
       TraineeProfile(-1, None, None, None, userId)
   }

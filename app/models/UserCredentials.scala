@@ -30,5 +30,11 @@ object UserCredentials {
     def writes(userRole: UserRole) = Json.obj("userRole" -> userRole.role)
   }
 
+  def toUserRole(role: String) = role match {
+    case "admin" => AdminRole
+    case "instructor" => InstructorRole
+    case "trainee" => TraineeRole
+  }
+
   implicit val userCredentialsFormat = Json.format[UserCredentials]
 }

@@ -19,7 +19,7 @@ class AuthorizedAction @Inject()(bodyParser: BodyParsers.Default)
     val userRole = for {
       token <- request.headers.get("JWT")
       jwt <- Token.validate(token)
-      role <- jwt.getClaim[UserRole]
+      role <- jwt.getClaim[Role]
     } yield role.value
 
     userRole match {
