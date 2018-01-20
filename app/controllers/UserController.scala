@@ -11,12 +11,12 @@ import models._
 import models.InstructorProfile._
 import play.api.libs.json._
 import play.api.mvc.{AbstractController, ControllerComponents}
-import repositories.UserRepository
+import daos.UserDAO
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(
-    userRepo: UserRepository,
+    userDao: UserDAO,
     instructorAction: InstructorAction,
     traineeAction: TraineeAction,
     authAction: AuthenticatedAction,
@@ -31,7 +31,7 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       credentials => {
-        userRepo.getCredentialsByEmail(credentials.email).map {
+        userDao.getCredentialsByEmail(credentials.email).map {
           case Some(user) if Security.checkPassword(credentials.password, user) =>
             Ok(Json.obj("token" -> Token.generate(user)))
           case _ => BadRequest(Json.obj("error" -> "No match for this email and password."))
@@ -47,9 +47,9 @@ class UserController @Inject()(
       },
       form => {
         val user = for {
-          userId <- userRepo.createUser(form, TraineeRole, currentTime)
-          _ <- userRepo.createTraineeProfile(userId)
-          newUser <- userRepo.getCredentialsById(userId)
+          userId <- userDao.createUser(form, TraineeRole, currentTime)
+          _ <- userDao.createTraineeProfile(userId)
+          newUser <- userDao.getCredentialsById(userId)
         } yield newUser
         user.map {
           case Some(u) => Created(Json.toJson(u))
@@ -66,9 +66,9 @@ class UserController @Inject()(
       },
       form => {
         val user = for {
-          userId <- userRepo.createUser(form, TraineeRole, currentTime)
-          _ <- userRepo.createInstructorProfile(userId)
-          newUser <- userRepo.getCredentialsById(userId)
+          userId <- userDao.createUser(form, TraineeRole, currentTime)
+          _ <- userDao.createInstructorProfile(userId)
+          newUser <- userDao.getCredentialsById(userId)
         } yield newUser
         user.map {
           case Some(u) => Created(Json.toJson(u))
@@ -83,7 +83,7 @@ class UserController @Inject()(
   }
 
   def getCredentials(id: Long) = Action.async { implicit request =>
-    userRepo.getCredentialsById(id).map {
+    userDao.getCredentialsById(id).map {
       case Some(credentials) => Ok(Json.toJson(credentials))
       case None => BadRequest(Json.obj("error" -> "User not found."))
     }
@@ -91,18 +91,18 @@ class UserController @Inject()(
 
   def getSelfProfile = authAction.async { implicit request =>
     request.credentials.userRole match {
-      case InstructorRole => userRepo.getInstructorProfile(request.userId)
+      case InstructorRole => userDao.getInstructorProfile(request.userId)
           .map(instructor => Ok(Json.toJson(instructor)))
-      case TraineeRole =>  userRepo.getTraineeProfile(request.userId)
+      case TraineeRole =>  userDao.getTraineeProfile(request.userId)
           .map(trainee => Ok(Json.toJson(trainee)))
     }
   }
 
   def getProfile(id: Long) = Action.async { implicit request =>
-    userRepo.getCredentialsById(id).flatMap {
+    userDao.getCredentialsById(id).flatMap {
       case Some(user) => user.userRole match {
-        case InstructorRole => userRepo.getInstructorProfile(id).map(inst => Ok(Json.toJson(inst)))
-        case TraineeRole => userRepo.getTraineeProfile(id).map(trai => Ok(Json.toJson(trai)))
+        case InstructorRole => userDao.getInstructorProfile(id).map(inst => Ok(Json.toJson(inst)))
+        case TraineeRole => userDao.getTraineeProfile(id).map(trai => Ok(Json.toJson(trai)))
       }
       case None => Future.successful(NotFound(Json.obj("error" -> "User not found.")))
     }
@@ -114,7 +114,7 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       profile => {
-        userRepo.updateInstructorProfile(request.userId, profile)
+        userDao.updateInstructorProfile(request.userId, profile)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )
@@ -126,7 +126,7 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       profile => {
-        userRepo.updateTraineeProfile(request.userId, profile)
+        userDao.updateTraineeProfile(request.userId, profile)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )
@@ -138,14 +138,14 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       credentials => {
-        userRepo.updateCredentials(request.userId, credentials)
+        userDao.updateCredentials(request.userId, credentials)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )
   }
 
   def delete = authAction.async { implicit request =>
-    userRepo.deleteUser(request.userId)
+    userDao.deleteUser(request.userId)
       .map(lines => Ok(Json.obj("deleted" -> lines)))
   }
 }

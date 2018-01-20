@@ -1,4 +1,4 @@
-package repositories
+package daos
 
 import java.sql.Timestamp
 import java.time.LocalDateTime
@@ -13,7 +13,7 @@ import slick.jdbc.PostgresProfile
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UserRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
+class UserDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
   val dbConfig = dbConfigProvider.get[PostgresProfile]
 
   import dbConfig._
