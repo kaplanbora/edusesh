@@ -22,12 +22,17 @@ CREATE TABLE "instructor_profiles" (
   ON UPDATE CASCADE
 );
 
+CREATE TABLE "main_topics" (
+  "id"   BIGSERIAL PRIMARY KEY,
+  "name" TEXT NOT NULL UNIQUE
+);
+
 CREATE TABLE "topics" (
   "id"        BIGSERIAL PRIMARY KEY,
   "name"      TEXT   NOT NULL UNIQUE,
   "parent_id" BIGINT NOT NULL,
   CONSTRAINT "topicsTopicsFK" FOREIGN KEY ("parent_id")
-  REFERENCES "topics" ("id")
+  REFERENCES "main_topics" ("id")
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
@@ -95,29 +100,6 @@ CREATE TABLE "messages" (
   ON UPDATE CASCADE
 );
 
-CREATE TABLE "lessons" (
-  "id"            BIGSERIAL PRIMARY KEY,
-  "instructor_id" BIGINT           NOT NULL,
-  "topic_id"      BIGINT           NOT NULL,
-  "name"          TEXT             NOT NULL,
-  "price"         DOUBLE PRECISION NOT NULL,
-  "creation_date" TIMESTAMP        NOT NULL,
-  "image_link"    TEXT,
-  "video_link"    TEXT,
-  "description"   TEXT,
-  "is_active"     BOOLEAN DEFAULT TRUE,
-  CONSTRAINT "priceCHK" CHECK ("price" > 0 AND "price" < 1000),
-  CONSTRAINT "lessonUQ" UNIQUE ("instructor_id", "name"),
-  CONSTRAINT "lessonsCredentialsFK" FOREIGN KEY ("instructor_id")
-  REFERENCES "user_credentials" ("id")
-  ON DELETE CASCADE
-  ON UPDATE CASCADE,
-  CONSTRAINT "lessonsTopicsFK" FOREIGN KEY ("topic_id")
-  REFERENCES "topics" ("id")
-  ON DELETE RESTRICT
-  ON UPDATE CASCADE
-);
-
 CREATE TABLE "sessions" (
   "id"            BIGSERIAL PRIMARY KEY,
   "name"          TEXT      NOT NULL,
@@ -178,9 +160,9 @@ CREATE TABLE "reviews" (
 );
 
 CREATE TABLE "session_files" (
-  "id" BIGSERIAL PRIMARY KEY,
+  "id"         BIGSERIAL PRIMARY KEY,
   "session_id" BIGINT NOT NULL,
-  "file_link" TEXT NOT NULL,
+  "file_link"  TEXT   NOT NULL,
   CONSTRAINT "sessionFilesFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")
   ON DELETE CASCADE
