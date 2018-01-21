@@ -27,7 +27,7 @@ CREATE TABLE "main_topics" (
   "name" TEXT NOT NULL UNIQUE
 );
 
-CREATE TABLE "topics" (
+CREATE TABLE "user_topics" (
   "id"        BIGSERIAL PRIMARY KEY,
   "name"      TEXT   NOT NULL UNIQUE,
   "parent_id" BIGINT NOT NULL,

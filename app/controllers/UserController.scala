@@ -20,8 +20,8 @@ class UserController @Inject()(
     instructorAction: InstructorAction,
     traineeAction: TraineeAction,
     authAction: AuthenticatedAction,
-    cc: ControllerComponents)
-  (implicit ec: ExecutionContext) extends AbstractController(cc) {
+    cc: ControllerComponents
+)(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def currentTime = LocalDateTime.now()
 
@@ -92,9 +92,9 @@ class UserController @Inject()(
   def getSelfProfile = authAction.async { implicit request =>
     request.credentials.userRole match {
       case InstructorRole => userDao.getInstructorProfile(request.userId)
-          .map(instructor => Ok(Json.toJson(instructor)))
-      case TraineeRole =>  userDao.getTraineeProfile(request.userId)
-          .map(trainee => Ok(Json.toJson(trainee)))
+        .map(instructor => Ok(Json.toJson(instructor)))
+      case TraineeRole => userDao.getTraineeProfile(request.userId)
+        .map(trainee => Ok(Json.toJson(trainee)))
     }
   }
 

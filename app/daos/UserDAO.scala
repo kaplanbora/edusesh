@@ -78,7 +78,7 @@ class UserDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: E
   private val traineeProfiles = TableQuery[TraineeProfilesTable]
   private val instructorProfiles = TableQuery[InstructorProfileTable]
 
-  def listCredentials(): Future[Seq[UserCredentials]] = db.run {
+  def listCredentials: Future[Seq[UserCredentials]] = db.run {
     userCredentials.result
   }
 
