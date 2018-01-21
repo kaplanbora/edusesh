@@ -31,8 +31,17 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     def * = (id, name, parentId) <> ((UserTopic.apply _).tupled, UserTopic.unapply)
   }
 
+  private class InstructorTopicTable(tag: Tag) extends Table[InstructorTopic](tag, "instructor_topics") {
+    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def instructorId = column[Long]("instructor_id")
+    def topicId = column[Long]("topic_id")
+
+    def * = (id, instructorId, topicId) <> ((InstructorTopic.apply _).tupled, InstructorTopic.unapply)
+  }
+
   private val mainTopicTable = TableQuery[MainTopicTable]
   private val userTopicTable = TableQuery[UserTopicTable]
+  private val instructorTopicTable = TableQuery[InstructorTopicTable]
 
   def listMainTopics: Future[Seq[MainTopic]] = db.run {
     mainTopicTable.result
@@ -58,5 +67,11 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     userTopicTable.filter(_.id === id)
       .delete
       .transactionally
+  }
+
+  def getTopicsForInstructor(id: Long): Future[Seq[UserTopic]] = db.run {
+    userTopicTable.filter(_.id in
+      instructorTopicTable.filter(_.instructorId === id).map(_.topicId)
+    ).result
   }
 }

@@ -17,3 +17,9 @@ PUT           /users/traineeProfile           controllers.UserController.updateT
 PUT           /users/credentials              controllers.UserController.updateCredentials
 DELETE        /users                          controllers.UserController.delete
 
+GET           /topics/user                    controllers.TopicController.getUserTopics
+GET           /topics/main                    controllers.TopicController.getMainTopics
+GET           /topics/instructor/:id          controllers.TopicController.getInstructorTopics(id: Long)
+PUT           /topics/user/:id                controllers.TopicController.updateUserTopic(id: Long)
+POST          /topics/user                    controllers.TopicController.createTopic
+DELETE        /topics/user/:id                controllers.TopicController.deleteTopic(id: Long)

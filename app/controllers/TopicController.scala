@@ -25,6 +25,11 @@ class TopicController @Inject()(
     topicDao.listUserTopics.map(topics => Ok(Json.toJson(topics)))
   }
 
+  def getInstructorTopics(id: Long) = Action.async { implicit request =>
+    topicDao.getTopicsForInstructor(id)
+      .map(topics => Ok(Json.toJson(topics)))
+  }
+
   def updateUserTopic(id: Long) = authAction(parse.json).async { implicit request =>
     request.body.validate[UserTopicForm].fold(
       errors => {
@@ -44,14 +49,17 @@ class TopicController @Inject()(
       },
       topic => {
         topicDao.createUserTopic(topic)
-          .map(lines => Ok(Json.toJson(lines)))
+          .map(id => Created(Json.toJson(id)))
       }
     )
   }
 
+  // TODO: Delete should only delete for that instructor
   def deleteTopic(id: Long) = authAction.async { implicit request =>
     topicDao.deleteUserTopic(id)
       .map(lines => Ok(Json.toJson(lines)))
   }
+
+  // TODO: Add method to add topics to an instructor
 }
 
