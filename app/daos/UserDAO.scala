@@ -1,41 +1,21 @@
 package daos
 
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import javax.inject.{Inject, Singleton}
 
 import forms._
 import auth.Security.encodePassword
 import models._
-import play.api.db.slick.DatabaseConfigProvider
+import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.PostgresProfile
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UserDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
-  val dbConfig = dbConfigProvider.get[PostgresProfile]
+class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext)
+  extends HasDatabaseConfigProvider[PostgresProfile] with DbMappings {
 
-  import dbConfig._
   import profile.api._
-
-  implicit val userRoleMap = MappedColumnType.base[UserRole, String](
-    {
-      case AdminRole => "admin"
-      case InstructorRole => "instructor"
-      case TraineeRole => "trainee"
-    },
-    {
-      case "admin" => AdminRole
-      case "instructor" => InstructorRole
-      case "trainee" => TraineeRole
-    }
-  )
-
-  implicit val timestampMap = MappedColumnType.base[LocalDateTime, Timestamp](
-    ldt => Timestamp.valueOf(ldt),
-    ts => ts.toLocalDateTime
-  )
 
   private class UserCredentialsTable(tag: Tag) extends Table[UserCredentials](tag, "user_credentials") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
