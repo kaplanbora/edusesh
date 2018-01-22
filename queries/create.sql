@@ -13,7 +13,7 @@ CREATE TABLE "instructor_profiles" (
   "description" TEXT,
   "occupation"  TEXT,
   "image_link"  TEXT,
-  "hourly_rate" DOUBLE PRECISION DEFAULT 0,
+  "hourly_rate" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "video_link"  TEXT,
   "user_id"     BIGINT NOT NULL UNIQUE,
   CONSTRAINT "profilesCredentialsFK" FOREIGN KEY ("user_id")
@@ -68,6 +68,8 @@ CREATE TABLE "conversations" (
   "id"       BIGSERIAL PRIMARY KEY,
   "user1_id" BIGINT NOT NULL,
   "user2_id" BIGINT NOT NULL,
+  "user1_removed" BOOLEAN NOT NULL DEFAULT FALSE,
+  "user2_removed" BOOLEAN NOT NULL DEFAULT FALSE,
   CONSTRAINT "accountsUQ" UNIQUE ("user1_id", "user2_id"),
   CONSTRAINT "conversationsCredentialsFK1" FOREIGN KEY ("user1_id")
   REFERENCES "user_credentials" ("id")
@@ -107,8 +109,8 @@ CREATE TABLE "sessions" (
   "instructor_id" BIGINT    NOT NULL,
   "topic_id"      BIGINT    NOT NULL,
   "date"          TIMESTAMP NOT NULL,
-  "is_approved"   BOOLEAN DEFAULT FALSE,
-  "is_completed"  BOOLEAN DEFAULT FALSE,
+  "is_approved"   BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_completed"  BOOLEAN NOT NULL DEFAULT FALSE,
   CONSTRAINT "sessionsTopicsFK" FOREIGN KEY ("topic_id")
   REFERENCES "topics" ("id")
   ON DELETE NO ACTION
@@ -129,7 +131,7 @@ CREATE TABLE "reports" (
   "user_id"     BIGINT    NOT NULL,
   "title"       TEXT      NOT NULL,
   "description" TEXT      NOT NULL,
-  "is_resolved" BOOLEAN DEFAULT FALSE,
+  "is_resolved" BOOLEAN NOT NULL DEFAULT FALSE,
   "date"        TIMESTAMP NOT NULL,
   CONSTRAINT "reportsSessionsFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")
