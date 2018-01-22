@@ -65,9 +65,9 @@ class ChatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
       Conversation(-1, form.userId1, form.userId2, form.userRemoved1, form.userRemoved2)
   }
 
-  def createMessage(form: MessageForm, date: LocalDateTime): Future[Long] = db.run {
+  def createMessage(conversationId: Long, form: MessageForm, date: LocalDateTime): Future[Long] = db.run {
     (messageTable returning messageTable.map(_.id)) +=
-      Message(-1, form.senderId, form.receiverId, form.conversationId, form.body, date)
+      Message(-1, form.senderId, form.receiverId, conversationId, form.body, date)
   }
 
   def updateConversation(form: ConversationForm): Future[Int] = db.run {

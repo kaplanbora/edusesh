@@ -23,3 +23,9 @@ GET           /topics/instructor/:id          controllers.TopicController.getIns
 PUT           /topics/user/:id                controllers.TopicController.updateUserTopic(id: Long)
 POST          /topics/user                    controllers.TopicController.createTopic
 DELETE        /topics/user/:id                controllers.TopicController.deleteTopic(id: Long)
+
+GET           /chat                           controllers.ChatController.getConversationsForUser
+GET           /chat/:id                       controllers.ChatController.getMessages(id: Long)
+POST          /chat                           controllers.ChatController.createConversation
+POST          /chat/:id                       controllers.ChatController.createMessage(id: Long)
+PUT           /chat                           controllers.ChatController.updateConversation

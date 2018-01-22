@@ -91,9 +91,9 @@ class UserController @Inject()(
 
   def getSelfProfile = authAction.async { implicit request =>
     request.credentials.userRole match {
-      case InstructorRole => userDao.getInstructorProfile(request.userId)
+      case InstructorRole => userDao.getInstructorProfile(request.credentials.id)
         .map(instructor => Ok(Json.toJson(instructor)))
-      case TraineeRole => userDao.getTraineeProfile(request.userId)
+      case TraineeRole => userDao.getTraineeProfile(request.credentials.id)
         .map(trainee => Ok(Json.toJson(trainee)))
     }
   }
@@ -138,14 +138,14 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       credentials => {
-        userDao.updateCredentials(request.userId, credentials)
+        userDao.updateCredentials(request.credentials.id, credentials)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )
   }
 
   def delete = authAction.async { implicit request =>
-    userDao.deleteUser(request.userId)
+    userDao.deleteUser(request.credentials.id)
       .map(lines => Ok(Json.obj("deleted" -> lines)))
   }
 }

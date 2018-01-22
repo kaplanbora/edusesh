@@ -11,7 +11,7 @@ import daos.UserDAO
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedRequest[A](val userId: Long, val credentials: UserCredentials, request: Request[A]) extends WrappedRequest[A](request)
+class AuthenticatedRequest[A](val credentials: UserCredentials, request: Request[A]) extends WrappedRequest[A](request)
 class InstructorRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
 class TraineeRequest[A](val userId: Long, request: Request[A]) extends WrappedRequest[A](request)
 
@@ -24,7 +24,7 @@ class AuthenticatedAction @Inject()(bodyParser: BodyParsers.Default, userDao: Us
 
     userDetails match {
       case Some((id, _)) => userDao.getCredentialsById(id).flatMap {
-        case Some(credentials) => block(new AuthenticatedRequest(id, credentials, request))
+        case Some(credentials) => block(new AuthenticatedRequest(credentials, request))
         case None => Future.successful(Forbidden(Json.obj("error" -> "User not found.")))
       }
       case _ =>
