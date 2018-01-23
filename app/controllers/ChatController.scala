@@ -12,7 +12,6 @@ import play.api.mvc.{AbstractController, ControllerComponents}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// TODD: Add messageAction to check if a user has access to conversation its trying to reach
 class ChatController @Inject()(
     chatDao: ChatDAO,
     authAction: AuthenticatedAction,

@@ -53,13 +53,5 @@ class TopicController @Inject()(
       }
     )
   }
-
-  // TODO: Delete should only delete for that instructor
-  def deleteTopic(id: Long) = authAction.async { implicit request =>
-    topicDao.deleteUserTopic(id)
-      .map(lines => Ok(Json.toJson(lines)))
-  }
-
-  // TODO: Add method to add topics to an instructor
 }
 
