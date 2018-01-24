@@ -69,9 +69,9 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
       .transactionally
   }
 
-  def getTopicsForInstructor(id: Long): Future[Seq[UserTopic]] = db.run {
-    userTopicTable.filter(_.id in
-      instructorTopicTable.filter(_.instructorId === id).map(_.topicId)
-    ).result
+  def getTopicsForInstructor(instructorId: Long): Future[Seq[UserTopic]] = db.run {
+    val topicIds = instructorTopicTable.filter(_.instructorId === instructorId).map(_.topicId)
+    userTopicTable.filter(_.id in topicIds)
+      .result
   }
 }

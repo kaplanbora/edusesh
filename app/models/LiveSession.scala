@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import forms.DateFormats
 import play.api.libs.json.Json
 
-case class Session(
+case class LiveSession(
     id: Long,
     name: String,
     traineeId: Long,
@@ -16,6 +16,6 @@ case class Session(
     isCompleted: Boolean
 )
 
-object Session extends DateFormats {
-  implicit val sessionFormat = Json.format[Session]
+object LiveSession extends DateFormats {
+  implicit val sessionFormat = Json.format[LiveSession]
 }
