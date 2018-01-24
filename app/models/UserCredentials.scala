@@ -2,6 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
+import forms.DateFormats
 import play.api.libs.json._
 
 abstract class UserRole(val role: String)
@@ -17,9 +18,7 @@ case class UserCredentials(
     userRole: UserRole
 )
 
-object UserCredentials {
-  import forms.TimestampFormats._
-
+object UserCredentials extends DateFormats {
   implicit object userRoleFormat extends Format[UserRole] {
     def reads(json: JsValue) = json match {
       case JsString("admin") => JsSuccess(AdminRole)

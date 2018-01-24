@@ -2,6 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
+import forms.DateFormats
 import play.api.libs.json.Json
 
 case class Review(
@@ -14,8 +15,6 @@ case class Review(
     date: LocalDateTime
 )
 
-object Review {
-  import forms.TimestampFormats._
-
+object Review extends DateFormats {
   implicit val reviewFormat = Json.format[Review]
 }

@@ -2,6 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
+import forms.DateFormats
 import play.api.libs.json.Json
 
 case class Message(
@@ -13,8 +14,6 @@ case class Message(
     date: LocalDateTime
 )
 
-object Message {
-  import forms.TimestampFormats._
-
+object Message extends DateFormats {
   implicit val messageFormat = Json.format[Message]
 }

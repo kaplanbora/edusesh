@@ -2,6 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
+import forms.DateFormats
 import play.api.libs.json.Json
 
 case class Session(
@@ -15,8 +16,6 @@ case class Session(
     isCompleted: Boolean
 )
 
-object Session {
-  import forms.TimestampFormats._
-
+object Session extends DateFormats {
   implicit val sessionFormat = Json.format[Session]
 }

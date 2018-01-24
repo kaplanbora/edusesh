@@ -2,6 +2,7 @@ package models
 
 import java.time.LocalDateTime
 
+import forms.DateFormats
 import play.api.libs.json.Json
 
 case class Report(
@@ -14,8 +15,6 @@ case class Report(
     date: LocalDateTime
 )
 
-object Report {
-  import forms.TimestampFormats._
-
+object Report extends DateFormats {
   implicit val reportFormat = Json.format[Report]
 }
