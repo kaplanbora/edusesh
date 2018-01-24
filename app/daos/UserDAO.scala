@@ -8,6 +8,7 @@ import auth.Security.encodePassword
 import models._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.PostgresProfile
+import util.DbMappings
 
 import scala.concurrent.{ExecutionContext, Future}
 

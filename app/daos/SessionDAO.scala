@@ -7,6 +7,7 @@ import forms._
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.PostgresProfile
 import models._
+import util.DbMappings
 
 import scala.concurrent.{ExecutionContext, Future}
 

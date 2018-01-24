@@ -2,8 +2,8 @@ package models
 
 import java.time.LocalDateTime
 
-import forms.DateFormats
 import play.api.libs.json.Json
+import util.DateFormats
 
 case class Message(
     id: Long,

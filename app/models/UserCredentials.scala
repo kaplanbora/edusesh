@@ -2,8 +2,8 @@ package models
 
 import java.time.LocalDateTime
 
-import forms.DateFormats
 import play.api.libs.json._
+import _root_.util.DateFormats
 
 abstract class UserRole(val role: String)
 case object AdminRole extends UserRole("admin")

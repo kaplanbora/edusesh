@@ -1,4 +1,4 @@
-package daos
+package util
 
 import java.sql.Timestamp
 import java.time.LocalDateTime
