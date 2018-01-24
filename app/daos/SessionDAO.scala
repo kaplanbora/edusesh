@@ -132,4 +132,52 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     (liveSessions returning liveSessions.map(_.id)) +=
       LiveSession(-1, form.name, form.traineeId, form.instructorId, form.topicId, form.date, form.isApproved, form.isCompleted)
   }
+
+  def createReport(form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
+    (reports returning reports.map(_.id)) +=
+      Report(-1, form.sessionId, form.userId, form.title, form.description, form.isResolved, date)
+  }
+
+  def createReview(form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
+    (reviews returning reviews.map(_.id)) +=
+      Review(-1, form.sessionId, form.traineeId, form.rating, form.title, form.comment, date)
+  }
+
+  def createSessionFile(form: SessionFileForm, date: LocalDateTime): Future[Long] = db.run {
+    (sessionFiles returning sessionFiles.map(_.id)) +=
+      SessionFile(-1, form.sessionId, form.name, form.link)
+  }
+
+  def updateSession(id: Long, form: SessionUpdateForm): Future[Int] = db.run {
+    liveSessions.filter(_.id === id)
+      .map(session => (session.isApproved, session.isCompleted))
+      .update((form.isApproved, form.isCompleted))
+      .transactionally
+  }
+
+  def updateReview(id: Long, form: ReviewUpdateForm): Future[Int] = db.run {
+    reviews.filter(_.id === id)
+      .map(review => (review.rating, review.title, review.comment))
+      .update((form.rating, form.title, form.comment))
+      .transactionally
+  }
+
+  def resolveReport(id: Long): Future[Int] = db.run {
+    reports.filter(_.id === id)
+      .map(_.isResolved)
+      .update(true)
+      .transactionally
+  }
+
+  def removeReview(id: Long): Future[Int] = db.run {
+    reviews.filter(_.id === id)
+      .delete
+      .transactionally
+  }
+
+  def removeSessionFile(id: Long): Future[Int] = db.run {
+    sessionFiles.filter(_.id === id)
+      .delete
+      .transactionally
+  }
 }

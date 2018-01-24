@@ -172,3 +172,10 @@ CREATE TABLE "session_files" (
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
+
+CREATE TABLE "notifications" (
+  "id" BIGSERIAL PRIMARY KEY,
+  "notif_type" TEXT NOT NULL,
+  "is_read" BOOLEAN NOT NULL DEFAULT FALSE
+  --add more stuff
+)
