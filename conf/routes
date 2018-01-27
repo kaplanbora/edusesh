@@ -3,28 +3,54 @@
 # ~~~~
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                   controllers.Assets.versioned(path="/public", file: Asset)
+GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
 
-POST          /login                          controllers.UserController.login
-POST          /registerTrainee                controllers.UserController.registerTrainee
-POST          /registerInstructor             controllers.UserController.registerInstructor
-GET           /users/credentials              controllers.UserController.getSelfCredentials
-GET           /users/credentials/:id          controllers.UserController.getCredentials(id: Long)
-GET           /users/profile                  controllers.UserController.getSelfProfile
-GET           /users/profile/:id              controllers.UserController.getProfile(id: Long)
-PUT           /users/instructorProfile        controllers.UserController.updateInstructorProfile
-PUT           /users/traineeProfile           controllers.UserController.updateTraineeProfile
-PUT           /users/credentials              controllers.UserController.updateCredentials
-DELETE        /users                          controllers.UserController.delete
 
-GET           /topics/user                    controllers.TopicController.getUserTopics
-GET           /topics/main                    controllers.TopicController.getMainTopics
-GET           /topics/instructor/:id          controllers.TopicController.getInstructorTopics(id: Long)
-PUT           /topics/user/:id                controllers.TopicController.updateUserTopic(id: Long)
-POST          /topics/user                    controllers.TopicController.createTopic
+POST          /login                             controllers.UserController.login
+POST          /register                          controllers.UserController.register(role: String)
 
-GET           /chat                           controllers.ChatController.getConversationsForUser
-GET           /chat/:id                       controllers.ChatController.getMessages(id: Long)
-POST          /chat                           controllers.ChatController.createConversation
-POST          /chat/:id                       controllers.ChatController.createMessage(id: Long)
-PUT           /chat                           controllers.ChatController.updateConversation
+GET           /users/sessions                    controllers.UserController.getSessions
+GET           /users/reports                     controllers.UserController.getReports
+GET           /users/reviews                     controllers.UserController.getReviews
+GET           /users/chats                       controllers.UserController.getConversations
+GET           /users/credentials                 controllers.UserController.getSelfCredentials
+GET           /users/profile                     controllers.UserController.getSelfProfile
+
+# Combine these two and return a public one
+GET           /users/:id/credentials             controllers.UserController.getCredentials(id: Long)
+GET           /users/:id/profile                 controllers.UserController.getProfile(id: Long)
+
+PUT           /users/instructorProfile           controllers.UserController.updateInstructorProfile
+PUT           /users/traineeProfile              controllers.UserController.updateTraineeProfile
+PUT           /users/credentials                 controllers.UserController.updateCredentials
+DELETE        /users                             controllers.UserController.delete
+
+GET           /topics/user                       controllers.TopicController.getUserTopics
+GET           /topics/main                       controllers.TopicController.getMainTopics
+GET           /topics/instructor/:id             controllers.TopicController.getInstructorTopics(id: Long)
+PUT           /topics/user/:id                   controllers.TopicController.updateUserTopic(id: Long)
+POST          /topics/user                       controllers.TopicController.createTopic
+
+GET           /chat/:id                          controllers.ChatController.getMessages(id: Long)
+POST          /chat                              controllers.ChatController.createConversation
+POST          /chat/:id                          controllers.ChatController.createMessage(id: Long)
+PUT           /chat                              controllers.ChatController.updateConversation
+
+GET           /sessions/:id                      controllers.SessionController.getSession(id: Long)
+PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
+POST          /sessions                          controllers.SessionController.createSession
+
+GET           /sessions/:sid/reports/:rid        controllers.SessionController.getReport(sid: Long, rid: Long)
+PUT           /sessions/:sid/reports/:rid        controllers.SessionController.resolveReport(sid: Long, rid: Long)
+POST          /sessions/:sid/reports             controllers.SessionController.createReport
+
+GET           /sessions/:sid/files               controllers.SessionController.getFiles(sid: Long)
+POST          /sessions/:sid/files               controllers.SessionController.createFiles
+
+GET           /sessions/:sid/reviews             controllers.SessionController.getReviews(sid: Long)
+POST          /sessions/:sid/reviews             controllers.SessionController.createReview(sid: Long)
+PUT           /sessions/:sid/reviews/:rid        controllers.SessionController.updateReview(sid: Long, rid: Long)
+DELETE        /sessions/:sid/reviews/:rid        controllers.SessionController.removeReview(sid: Long, rid: Long)
+
+
+

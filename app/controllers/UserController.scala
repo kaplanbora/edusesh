@@ -10,7 +10,7 @@ import forms.UserForms._
 import models._
 import models.InstructorProfile._
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, ControllerComponents}
+import play.api.mvc.{AbstractController, ControllerComponents, Result}
 import daos.UserDAO
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,8 +40,16 @@ class UserController @Inject()(
     )
   }
 
-  def registerTrainee = Action(parse.json).async { implicit request =>
-    request.body.validate[UserCredentialsForm].fold(
+  def register(role: String) = Action(parse.json).async { implicit request =>
+    role match {
+      case "instructor" => registerTrainee(request.body)
+      case "trainee" => registerTrainee(request.body)
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Incorrect user role.")))
+    }
+  }
+
+  def registerTrainee(body: JsValue): Future[Result] = {
+    body.validate[UserCredentialsForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
@@ -59,8 +67,8 @@ class UserController @Inject()(
     )
   }
 
-  def registerInstructor = Action(parse.json).async { implicit request =>
-    request.body.validate[UserCredentialsForm].fold(
+  def registerInstructor(body: JsValue): Future[Result] = {
+    body.validate[UserCredentialsForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
