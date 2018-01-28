@@ -16,7 +16,9 @@ import daos.UserDAO
 import scala.concurrent.{ExecutionContext, Future}
 
 class UserController @Inject()(
+    chatDao: ChatDAO,
     userDao: UserDAO,
+    sessionDao: SessionDAO,
     instructorAction: InstructorAction,
     traineeAction: TraineeAction,
     authAction: AuthenticatedAction,
@@ -86,6 +88,30 @@ class UserController @Inject()(
     )
   }
 
+  def getSessions = authAction.async { implicit request =>
+    sessionDao.getSessionsForUser(request.credentials.id)
+      .map(sessions => Ok(Json.toJson(sessions)))
+  }
+
+  def getReports = authAction.async { implicit request =>
+    sessionDao.getReportsForUser(request.credentials.id)
+      .map(reports => Ok(Json.toJson(reports)))
+  }
+
+  def getReviews = authAction.async { implicit request =>
+    request.credentials.userRole match {
+      case InstructorRole => sessionDao.getReviewsForInstructor(request.credentials.id)
+        .map(reviews => Ok(Json.toJson(reviews)))
+      case TraineeRole => sessionDao.getReviewsForInstructor(request.credentials.id)
+        .map(reviews => Ok(Json.toJson(reviews)))
+      case _ => Future.successful(NotFound(Json.obj("error" -> "Unknown user role.")))
+    }
+  }
+
+  def getConversations = authAction.async { implicit request =>
+    chatDao.getConversationsForUser(request.credentials.id)
+  }
+
   def getSelfCredentials = authAction.async { implicit request =>
     Future.successful(Ok(Json.toJson(request.credentials)))
   }
@@ -103,6 +129,7 @@ class UserController @Inject()(
         .map(instructor => Ok(Json.toJson(instructor)))
       case TraineeRole => userDao.getTraineeProfile(request.credentials.id)
         .map(trainee => Ok(Json.toJson(trainee)))
+      case _ => Future.successful(NotFound(Json.obj("error" -> "Unknown user role.")))
     }
   }
 
@@ -111,13 +138,22 @@ class UserController @Inject()(
       case Some(user) => user.userRole match {
         case InstructorRole => userDao.getInstructorProfile(id).map(inst => Ok(Json.toJson(inst)))
         case TraineeRole => userDao.getTraineeProfile(id).map(trai => Ok(Json.toJson(trai)))
+        case _ => Future.successful(NotFound(Json.obj("error" -> "Unknown user role.")))
       }
       case None => Future.successful(NotFound(Json.obj("error" -> "User not found.")))
     }
   }
 
-  def updateInstructorProfile = instructorAction(parse.json).async { implicit request =>
-    request.body.validate[InstructorProfileForm].fold(
+  def updateProfile = authAction(parse.json).async { implicit request =>
+    request.credentials.userRole match {
+      case InstructorRole => updateInstructorProfile(request.body)
+      case TraineeRole => updateTraineeProfile(request.body)
+      case _ => Future.successful(NotFound(Json.obj("error" -> "Unknown user role.")))
+    }
+  }
+
+  def updateInstructorProfile(body: JsValue): Future[Result] = {
+    body.validate[InstructorProfileForm].fold( 
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
@@ -128,8 +164,8 @@ class UserController @Inject()(
     )
   }
 
-  def updateTraineeProfile = traineeAction(parse.json).async { implicit request =>
-    request.body.validate[TraineeProfileForm].fold(
+  def updateTraineeProfile(body: JsValue): Future[Result] = {
+    body.validate[TraineeProfileForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
