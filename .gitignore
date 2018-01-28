@@ -1,6 +1,6 @@
 signal-server/node_modules
-.idea/
-doc/
+.idea
+doc
 
 # CMake
 cmake-build-debug/
