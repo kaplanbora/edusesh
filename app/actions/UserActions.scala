@@ -80,3 +80,25 @@ class TraineeAction @Inject()(bodyParser: BodyParsers.Default, userDao: UserDAO)
   override def parser: BodyParser[AnyContent] = bodyParser
   override protected def executionContext: ExecutionContext = ec
 }
+
+// Validates the request for only admins
+class AdminAction @Inject()(bodyParser: BodyParsers.Default, userDao: UserDAO)
+  (implicit ec: ExecutionContext) extends ActionBuilder[AuthenticatedRequest, AnyContent] {
+
+  def invokeBlock[A](request: Request[A], block: AuthenticatedRequest[A] => Future[Result]) = {
+    val userDetails = extractTokenInfo(request)
+
+    userDetails match {
+      case Some((id, role)) if role == "trainee" => userDao.getCredentialsById(id).flatMap {
+        case Some(credentials) => block(new AuthenticatedRequest(credentials, request))
+        case None => Future.successful(NotFound(Json.obj("error" -> "User Not Found")))
+      }
+      case _ =>
+        logBadRequests(request, "User not found or incorrect role.")
+        Future.successful(Forbidden(Json.obj("error" -> "Authentication Error")))
+    }
+  }
+
+  override def parser: BodyParser[AnyContent] = bodyParser
+  override protected def executionContext: ExecutionContext = ec
+}
