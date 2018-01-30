@@ -10,8 +10,8 @@ import forms.UserForms._
 import models._
 import models.InstructorProfile._
 import play.api.libs.json._
-import play.api.mvc.{AbstractController, ControllerComponents, Result}
-import daos.UserDAO
+import play.api.mvc._
+import daos._
 
 import scala.concurrent.{ExecutionContext, Future}
 

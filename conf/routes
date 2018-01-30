@@ -20,8 +20,7 @@ GET           /users/profile                     controllers.UserController.getS
 GET           /users/:id/credentials             controllers.UserController.getCredentials(id: Long)
 GET           /users/:id/profile                 controllers.UserController.getProfile(id: Long)
 
-PUT           /users/instructorProfile           controllers.UserController.updateInstructorProfile
-PUT           /users/traineeProfile              controllers.UserController.updateTraineeProfile
+PUT           /users/profile                     controllers.UserController.updateProfile
 PUT           /users/credentials                 controllers.UserController.updateCredentials
 DELETE        /users                             controllers.UserController.delete
 
@@ -42,10 +41,10 @@ POST          /sessions                          controllers.SessionController.c
 
 GET           /sessions/:sid/reports/:rid        controllers.SessionController.getReport(sid: Long, rid: Long)
 PUT           /sessions/:sid/reports/:rid        controllers.SessionController.resolveReport(sid: Long, rid: Long)
-POST          /sessions/:sid/reports             controllers.SessionController.createReport
+POST          /sessions/:sid/reports             controllers.SessionController.createReport(sid: Long)
 
 GET           /sessions/:sid/files               controllers.SessionController.getFiles(sid: Long)
-POST          /sessions/:sid/files               controllers.SessionController.createFiles
+POST          /sessions/:sid/files               controllers.SessionController.createFiles(sid: Long)
 
 GET           /sessions/:sid/reviews             controllers.SessionController.getReviews(sid: Long)
 POST          /sessions/:sid/reviews             controllers.SessionController.createReview(sid: Long)
