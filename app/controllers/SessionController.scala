@@ -91,7 +91,7 @@ class SessionController @Inject()(
 
   def createReview(sessionId: Long) = authAction(parse.json).async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
-      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id => {
+      case Some(s) if (s.instructorId == request.credentials.id || s.traineeId == request.credentials.id) && s.isCompleted =>
         request.body.validate[ReviewForm].fold(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
@@ -99,7 +99,6 @@ class SessionController @Inject()(
           reviewForm => sessionDao.createReview(sessionId, reviewForm, LocalDateTime.now())
             .map(id => Created(Json.toJson(id)))
         )
-      }
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
   }

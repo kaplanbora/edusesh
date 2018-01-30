@@ -35,7 +35,7 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def sessionId = column[Long]("session_id")
     def userId = column[Long]("user_id")
-    def title = column[String]("name")
+    def title = column[String]("title")
     def description = column[String]("description")
     def isResolved = column[Boolean]("is_resolved")
     def date = column[LocalDateTime]("date")
@@ -51,7 +51,7 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     def sessionId = column[Long]("session_id")
     def traineeId = column[Long]("trainee_id")
     def rating = column[Double]("rating")
-    def title = column[String]("name")
+    def title = column[String]("title")
     def comment = column[Option[String]]("comment")
     def date = column[LocalDateTime]("date")
 

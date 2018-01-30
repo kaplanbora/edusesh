@@ -44,7 +44,7 @@ class UserController @Inject()(
 
   def register(role: String) = Action(parse.json).async { implicit request =>
     role match {
-      case "instructor" => registerTrainee(request.body)
+      case "instructor" => registerInstructor(request.body)
       case "trainee" => registerTrainee(request.body)
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Incorrect user role.")))
     }
@@ -76,7 +76,7 @@ class UserController @Inject()(
       },
       form => {
         val user = for {
-          userId <- userDao.createUser(form, TraineeRole, currentTime)
+          userId <- userDao.createUser(form, InstructorRole, currentTime)
           _ <- userDao.createInstructorProfile(userId)
           newUser <- userDao.getCredentialsById(userId)
         } yield newUser
