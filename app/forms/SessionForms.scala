@@ -18,7 +18,6 @@ case class SessionForm(
 case class SessionUpdateForm(isApproved: Boolean, isCompleted: Boolean)
 
 case class ReportForm(
-    sessionId: Long,
     userId: Long,
     title: String,
     description: String,
@@ -26,7 +25,6 @@ case class ReportForm(
 )
 
 case class ReviewForm(
-    sessionId: Long,
     traineeId: Long,
     rating: Double,
     title: String,
@@ -36,7 +34,6 @@ case class ReviewForm(
 case class ReviewUpdateForm(rating: Double, title: String, comment: Option[String])
 
 case class SessionFileForm(
-    sessionId: Long,
     name: String,
     link: String
 )

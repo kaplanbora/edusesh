@@ -133,19 +133,19 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       LiveSession(-1, form.name, form.traineeId, form.instructorId, form.topicId, form.date, form.isApproved, form.isCompleted)
   }
 
-  def createReport(form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
+  def createReport(sessionId: Long, form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
     (reports returning reports.map(_.id)) +=
-      Report(-1, form.sessionId, form.userId, form.title, form.description, form.isResolved, date)
+      Report(-1, sessionId, form.userId, form.title, form.description, form.isResolved, date)
   }
 
-  def createReview(form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
+  def createReview(sessionId: Long, form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
     (reviews returning reviews.map(_.id)) +=
-      Review(-1, form.sessionId, form.traineeId, form.rating, form.title, form.comment, date)
+      Review(-1, sessionId, form.traineeId, form.rating, form.title, form.comment, date)
   }
 
-  def createSessionFile(form: SessionFileForm, date: LocalDateTime): Future[Long] = db.run {
+  def createSessionFile(sessionId: Long, form: SessionFileForm, date: LocalDateTime): Future[Long] = db.run {
     (sessionFiles returning sessionFiles.map(_.id)) +=
-      SessionFile(-1, form.sessionId, form.name, form.link)
+      SessionFile(-1, sessionId, form.name, form.link)
   }
 
   def updateSession(id: Long, form: SessionUpdateForm): Future[Int] = db.run {

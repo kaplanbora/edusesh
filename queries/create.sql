@@ -151,6 +151,7 @@ CREATE TABLE "reviews" (
   "title"      TEXT             NOT NULL,
   "comment"    TEXT,
   "date"       TIMESTAMP        NOT NULL,
+  CONSTRAINT "reviewsUQ" UNIQUE ("trainee_id", "session_id"),
   CONSTRAINT "ratingChk" CHECK ("rating" >= 0 AND "rating" <= 5),
   CONSTRAINT "reviewsSessionsFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")
