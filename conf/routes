@@ -40,7 +40,6 @@ PUT           /sessions/:id                      controllers.SessionController.u
 POST          /sessions                          controllers.SessionController.createSession
 
 GET           /sessions/:sid/reports/:rid        controllers.SessionController.getReport(sid: Long, rid: Long)
-PUT           /sessions/:sid/reports/:rid        controllers.SessionController.resolveReport(sid: Long, rid: Long)
 POST          /sessions/:sid/reports             controllers.SessionController.createReport(sid: Long)
 
 GET           /sessions/:sid/files               controllers.SessionController.getFiles(sid: Long)
@@ -51,5 +50,7 @@ POST          /sessions/:sid/reviews             controllers.SessionController.c
 PUT           /sessions/:sid/reviews/:rid        controllers.SessionController.updateReview(sid: Long, rid: Long)
 DELETE        /sessions/:sid/reviews/:rid        controllers.SessionController.removeReview(sid: Long, rid: Long)
 
+# Admin
+PUT           /sessions/:sid/reports/:rid        controllers.SessionController.resolveReport(sid: Long, rid: Long)
 
 

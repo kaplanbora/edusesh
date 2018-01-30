@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import actions._
 import forms._
+import forms.SessionForms._
 import models._
 import play.api.libs.json._
 import daos.SessionDAO
@@ -121,6 +122,39 @@ class SessionController @Inject()(
     sessionDao.getSession(sessionId).flatMap {
       case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
         sessionDao.removeReview(reviewId).map(lines => Ok(Json.toJson(lines)))
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
+    }
+  }
+
+  def getReport(sessionId: Long, reportId: Long) = authAction.async { implicit request =>
+    sessionDao.getSession(sessionId).flatMap {
+      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
+        sessionDao.getReport(reportId).map {
+          case Some(rep) if rep.userId == request.credentials.id => Ok(Json.toJson(rep))
+          case _ => BadRequest(Json.obj("error" -> "Report not found or invalid authentication."))
+        }
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
+    }
+  }
+
+  def resolveReport(sessionId: Long, reportId: Long) = authAction.async { implicit request =>
+    sessionDao.getSession(sessionId).flatMap {
+      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
+        sessionDao.resolveReport(reportId).map(lines => Ok(Json.toJson(lines)))
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
+    }
+  }
+
+  def createReport(sessionId: Long) = authAction(parse.json).async { implicit request =>
+    sessionDao.getSession(sessionId).flatMap {
+      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
+        request.body.validate[ReportForm].fold(
+          errors => {
+            Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+          },
+          reportForm => sessionDao.createReport(sessionId, reportForm, LocalDateTime.now())
+            .map(id => Created(Json.toJson(id)))
+        )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
   }

@@ -110,6 +110,7 @@ class UserController @Inject()(
 
   def getConversations = authAction.async { implicit request =>
     chatDao.getConversationsForUser(request.credentials.id)
+      .map(convs => Ok(Json.toJson(convs)))
   }
 
   def getSelfCredentials = authAction.async { implicit request =>
@@ -146,31 +147,31 @@ class UserController @Inject()(
 
   def updateProfile = authAction(parse.json).async { implicit request =>
     request.credentials.userRole match {
-      case InstructorRole => updateInstructorProfile(request.body)
-      case TraineeRole => updateTraineeProfile(request.body)
+      case InstructorRole => updateInstructorProfile(request.body, request.credentials.id)
+      case TraineeRole => updateTraineeProfile(request.body, request.credentials.id)
       case _ => Future.successful(NotFound(Json.obj("error" -> "Unknown user role.")))
     }
   }
 
-  def updateInstructorProfile(body: JsValue): Future[Result] = {
-    body.validate[InstructorProfileForm].fold( 
+  def updateInstructorProfile(body: JsValue, userId: Long): Future[Result] = {
+    body.validate[InstructorProfileForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       profile => {
-        userDao.updateInstructorProfile(request.userId, profile)
+        userDao.updateInstructorProfile(userId, profile)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )
   }
 
-  def updateTraineeProfile(body: JsValue): Future[Result] = {
+  def updateTraineeProfile(body: JsValue, userId: Long): Future[Result] = {
     body.validate[TraineeProfileForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       profile => {
-        userDao.updateTraineeProfile(request.userId, profile)
+        userDao.updateTraineeProfile(userId, profile)
           .map(lines => Ok(Json.obj("updated" -> lines)))
       }
     )

@@ -40,7 +40,9 @@ case class SessionFileForm(
 
 object SessionForms extends DateFormats {
   implicit val sessionFormFormat = Json.format[SessionForm]
+  implicit val sessionUpdateFormFormat = Json.format[SessionUpdateForm]
   implicit val reportFormFormat = Json.format[ReportForm]
   implicit val reviewFormFormat = Json.format[ReviewForm]
+  implicit val reviewUpdateFormFormat = Json.format[ReviewUpdateForm]
   implicit val sessionFileFormFormat = Json.format[SessionFileForm]
 }
