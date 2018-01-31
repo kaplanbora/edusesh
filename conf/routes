@@ -19,21 +19,21 @@ GET           /users/profile                     controllers.UserController.getS
 # Combine these two and return a public one
 GET           /users/:id/credentials             controllers.UserController.getCredentials(id: Long)
 GET           /users/:id/profile                 controllers.UserController.getProfile(id: Long)
+GET           /users/:id/topics/                 controllers.TopicController.getInstructorTopics(id: Long)
 
+PUT           /users/topics                      controllers.TopicController.updateUserTopic(id: Long)
 PUT           /users/profile                     controllers.UserController.updateProfile
 PUT           /users/credentials                 controllers.UserController.updateCredentials
 DELETE        /users                             controllers.UserController.delete
 
 GET           /topics/user                       controllers.TopicController.getUserTopics
 GET           /topics/main                       controllers.TopicController.getMainTopics
-GET           /topics/instructor/:id             controllers.TopicController.getInstructorTopics(id: Long)
-PUT           /topics/user/:id                   controllers.TopicController.updateUserTopic(id: Long)
 POST          /topics/user                       controllers.TopicController.createTopic
 
-GET           /chat/:id                          controllers.ChatController.getMessages(id: Long)
-POST          /chat                              controllers.ChatController.createConversation
-POST          /chat/:id                          controllers.ChatController.createMessage(id: Long)
-PUT           /chat                              controllers.ChatController.updateConversation
+GET           /chats/:id/messages                controllers.ChatController.getMessages(id: Long)
+POST          /chats                             controllers.ChatController.createConversation(target: Long)
+POST          /chats/:id/messages                controllers.ChatController.createMessage(id: Long)
+PATCH         /chats/:id                         controllers.ChatController.updateConversation(id: Long, removed: Boolean)
 
 GET           /sessions/:id                      controllers.SessionController.getSession(id: Long)
 PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)

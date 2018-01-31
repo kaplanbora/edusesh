@@ -18,57 +18,45 @@ class ChatController @Inject()(
     cc: ControllerComponents
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  // If a user deleted this conversation don't send the conversation to them
-  def getConversationsForUser = authAction.async { implicit request =>
-    chatDao.getConversationsForUser(request.credentials.id).map(conversations => {
-      conversations.filter(conv => (conv.userId1, conv.userId2) match {
-        case (request.credentials.id, _) if conv.userRemoved1 => false
-        case (_, request.credentials.id) if conv.userRemoved2 => false
-        case _ => true
-      })
-      Ok(Json.toJson(conversations))
-    })
-  }
-
   def getMessages(conversationId: Long) = authAction.async { implicit request =>
     chatDao.getMessagesForConversation(conversationId)
       .map(conversations => Ok(Json.toJson(conversations)))
   }
 
-  def createConversation = authAction(parse.json).async { implicit request =>
-    request.body.validate[ConversationForm].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-      },
-      conversation => {
-        chatDao.createConversation(conversation)
-          .map(id => Created(Json.toJson(id)))
-      }
-    )
+  def createConversation(targetId: Long) = authAction.async { implicit request =>
+    chatDao.getConversationForUsers(targetId, request.credentials.id).flatMap {
+      case Some(conv) => Future.successful(Ok(Json.toJson(conv.id)))
+      case _ => chatDao.createConversation(request.credentials.id, targetId)
+        .map(id => Created(Json.toJson(id)))
+    }
   }
 
-  def createMessage(id: Long) = authAction(parse.json).async { implicit request =>
-    request.body.validate[MessageForm].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-      },
-      message => {
-        chatDao.createMessage(id, message, LocalDateTime.now())
-          .map(id => Created(Json.toJson(id)))
-      }
-    )
+  def createMessage(conversationId: Long) = authAction(parse.json).async { implicit request =>
+    chatDao.getConversation(conversationId).flatMap {
+      case Some(conv) if conv.userId1 == request.credentials.id || conv.userId2 == request.credentials.id =>
+        request.body.validate[MessageForm].fold(
+          errors => {
+            Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+          },
+          message => {
+            chatDao.createMessage(conversationId, request.credentials.id, message, LocalDateTime.now())
+              .map(id => Created(Json.toJson(id)))
+          }
+        )
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Conversation doesn't exists or invalid authentication.")))
+    }
   }
 
   // When a user deletes a conversation its not removed but hidden from them
-  def updateConversation = authAction(parse.json).async {implicit request =>
-    request.body.validate[ConversationForm].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-      },
-      conversation => {
-        chatDao.updateConversation(conversation)
+  def updateConversation(conversationId: Long, removed: Boolean) = authAction.async { implicit request =>
+    chatDao.getConversation(conversationId).flatMap {
+      case Some(conv) if removed && conv.userId1 == request.credentials.id =>
+        chatDao.removeForUser1(conversationId)
           .map(lines => Ok(Json.toJson(lines)))
-      }
-    )
+      case Some(conv) if removed && conv.userId2 == request.credentials.id =>
+        chatDao.removeForUser2(conversationId)
+          .map(lines => Ok(Json.toJson(lines)))
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Conversation doesn't exists or invalid authentication.")))
+    }
   }
 }

@@ -108,9 +108,21 @@ class UserController @Inject()(
     }
   }
 
+  //  def getConversations = authAction.async { implicit request =>
+  //    chatDao.getConversationsForUser(request.credentials.id)
+  //      .map(convs => Ok(Json.toJson(convs)))
+  //  }
+
+  // If a user deleted this conversation don't send the conversation to them
   def getConversations = authAction.async { implicit request =>
-    chatDao.getConversationsForUser(request.credentials.id)
-      .map(convs => Ok(Json.toJson(convs)))
+    chatDao.getConversationsForUser(request.credentials.id).map(conversations => {
+      Ok(Json.toJson(
+        conversations.filter(conv => (conv.userId1, conv.userId2) match {
+          case (request.credentials.id, _) if conv.userRemoved1 => false
+          case (_, request.credentials.id) if conv.userRemoved2 => false
+          case _ => true
+        })))
+    })
   }
 
   def getSelfCredentials = authAction.async { implicit request =>

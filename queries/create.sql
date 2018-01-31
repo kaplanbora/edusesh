@@ -84,15 +84,10 @@ CREATE TABLE "conversations" (
 CREATE TABLE "messages" (
   "id"              BIGSERIAL PRIMARY KEY,
   "sender_id"       BIGINT    NOT NULL,
-  "receiver_id"     BIGINT    NOT NULL,
   "conversation_id" BIGINT    NOT NULL,
   "body"            TEXT      NOT NULL,
   "date"            TIMESTAMP NOT NULL,
   CONSTRAINT "messageAccountFK1" FOREIGN KEY ("sender_id")
-  REFERENCES "user_credentials" ("id")
-  ON DELETE NO ACTION
-  ON UPDATE CASCADE,
-  CONSTRAINT "messageAccountFK2" FOREIGN KEY ("receiver_id")
   REFERENCES "user_credentials" ("id")
   ON DELETE NO ACTION
   ON UPDATE CASCADE,

@@ -8,7 +8,6 @@ import util.DateFormats
 case class Message(
     id: Long,
     senderId: Long,
-    receiverId: Long,
     conversationId: Long,
     body: String,
     date: LocalDateTime
