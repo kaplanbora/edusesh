@@ -8,6 +8,7 @@ import slick.jdbc.PostgresProfile
 import models._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 @Singleton
 class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
@@ -51,20 +52,25 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     userTopicTable.result
   }
 
+  def getUserTopic(name: String): Future[Option[UserTopic]] = db.run {
+    userTopicTable.filter(_.name === name)
+      .result
+      .headOption
+  }
+
   def createUserTopic(form: UserTopicForm): Future[Long] = db.run {
     (userTopicTable returning userTopicTable.map(_.id)) +=
       UserTopic(-1, form.name, form.parentId)
   }
 
-  def updateUserTopic(id: Long, form: UserTopicForm): Future[Int] = db.run {
-    userTopicTable.filter(_.id === id)
-      .map(topic => (topic.name, topic.parentId))
-      .update((form.name, form.parentId))
-      .transactionally
+  def addInstructorTopic(instructorId: Long, topicId: Long): Future[Long] = db.run {
+    (instructorTopicTable returning instructorTopicTable.map(_.id)) +=
+      InstructorTopic(-1, instructorId, topicId)
   }
 
-  def deleteUserTopic(id: Long): Future[Int] = db.run {
-    userTopicTable.filter(_.id === id)
+  def deleteInstructorTopic(instructorId: Long, topicId: Long): Future[Int] = db.run {
+    instructorTopicTable
+      .filter(topic => topic.topicId === topicId && topic.instructorId === instructorId)
       .delete
       .transactionally
   }

@@ -5,30 +5,29 @@
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
 
-
-POST          /login                             controllers.UserController.login
-POST          /register                          controllers.UserController.register(role: String)
-
 GET           /users/sessions                    controllers.UserController.getSessions
 GET           /users/reports                     controllers.UserController.getReports
 GET           /users/reviews                     controllers.UserController.getReviews
 GET           /users/chats                       controllers.UserController.getConversations
 GET           /users/credentials                 controllers.UserController.getSelfCredentials
 GET           /users/profile                     controllers.UserController.getSelfProfile
+GET           /users/topics                      controllers.TopicController.getSelfTopics
 
-# Combine these two and return a public one
 GET           /users/:id/credentials             controllers.UserController.getCredentials(id: Long)
 GET           /users/:id/profile                 controllers.UserController.getProfile(id: Long)
-GET           /users/:id/topics/                 controllers.TopicController.getInstructorTopics(id: Long)
+GET           /users/:id/topics                  controllers.TopicController.getInstructorTopics(id: Long)
 
-PUT           /users/topics                      controllers.TopicController.updateUserTopic(id: Long)
+POST          /users/login                       controllers.UserController.login
+POST          /users/register                    controllers.UserController.register(role: String)
+POST          /users/topics                      controllers.TopicController.addTopic
+
 PUT           /users/profile                     controllers.UserController.updateProfile
 PUT           /users/credentials                 controllers.UserController.updateCredentials
+
+DELETE        /users/topics/:id                  controllers.TopicController.deleteInstructorTopic(id: Long)
 DELETE        /users                             controllers.UserController.delete
 
-GET           /topics/user                       controllers.TopicController.getUserTopics
-GET           /topics/main                       controllers.TopicController.getMainTopics
-POST          /topics/user                       controllers.TopicController.createTopic
+GET           /topics                            controllers.TopicController.getTopics(t: String)
 
 GET           /chats/:id/messages                controllers.ChatController.getMessages(id: Long)
 POST          /chats                             controllers.ChatController.createConversation(target: Long)

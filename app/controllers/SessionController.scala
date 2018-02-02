@@ -64,7 +64,7 @@ class SessionController @Inject()(
 
   def createFiles(sessionId: Long) = authAction(parse.json).async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
-      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id => {
+      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
         request.body.validate[SessionFileForm].fold(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
@@ -72,7 +72,6 @@ class SessionController @Inject()(
           fileForm => sessionDao.createSessionFile(sessionId, fileForm, LocalDateTime.now())
             .map(id => Created(Json.toJson(id)))
         )
-      }
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
   }

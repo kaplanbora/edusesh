@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
-import actions.AuthenticatedAction
+import actions.{AuthenticatedAction, InstructorAction}
 import daos.TopicDAO
 import forms.UserTopicForm
 import forms.TopicForms._
@@ -14,15 +14,21 @@ import scala.concurrent.{ExecutionContext, Future}
 class TopicController @Inject()(
     topicDao: TopicDAO,
     authAction: AuthenticatedAction,
+    instructorAction: InstructorAction,
     cc: ControllerComponents
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  def getMainTopics = Action.async { implicit request =>
-    topicDao.listMainTopics.map(topics => Ok(Json.toJson(topics)))
+  def getTopics(t: String) = Action.async { implicit request =>
+    t match {
+      case "main" => topicDao.listMainTopics.map(topics => Ok(Json.toJson(topics)))
+      case "user" => topicDao.listUserTopics.map(topics => Ok(Json.toJson(topics)))
+      case _ => Future.successful(BadRequest(Json.obj("error" -> "Unknown topic type.")))
+    }
   }
 
-  def getUserTopics = Action.async { implicit request =>
-    topicDao.listUserTopics.map(topics => Ok(Json.toJson(topics)))
+  def getSelfTopics = instructorAction.async { implicit request =>
+    topicDao.getTopicsForInstructor(request.userId)
+      .map(topics => Ok(Json.toJson(topics)))
   }
 
   def getInstructorTopics(id: Long) = Action.async { implicit request =>
@@ -30,26 +36,28 @@ class TopicController @Inject()(
       .map(topics => Ok(Json.toJson(topics)))
   }
 
-  def updateUserTopic(id: Long) = authAction(parse.json).async { implicit request =>
-    request.body.validate[UserTopicForm].fold(
-      errors => {
-        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-      },
-      topic => {
-        topicDao.updateUserTopic(id, topic)
-          .map(lines => Ok(Json.toJson(lines)))
-      }
-    )
+  def deleteInstructorTopic(id: Long) = instructorAction.async { implicit request =>
+    topicDao.deleteInstructorTopic(request.userId, id)
+      .map(lines => Ok(Json.toJson(lines > 0)))
   }
 
-  def createTopic = authAction(parse.json).async { implicit request =>
+  /**
+    * When an instructor adds a topic to its profile
+    * First we check if that topic exists. If it exists we add it to its profile
+    * If it does not exist, we create a new user topic and add it to its profile
+    */
+  def addTopic = instructorAction(parse.json).async { implicit request =>
     request.body.validate[UserTopicForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
-      topic => {
-        topicDao.createUserTopic(topic)
+      topic => topicDao.getUserTopic(topic.name).flatMap {
+        case Some(t) => topicDao.addInstructorTopic(request.userId, t.id)
           .map(id => Created(Json.toJson(id)))
+        case None => for {
+          id <- topicDao.createUserTopic(topic)
+          addedId <- topicDao.addInstructorTopic(request.userId, id)
+        } yield Created(Json.toJson(addedId))
       }
     )
   }
