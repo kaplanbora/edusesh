@@ -47,7 +47,7 @@ CREATE TABLE "instructor_topics" (
   ON DELETE CASCADE
   ON UPDATE CASCADE,
   CONSTRAINT "instopicsFK2" FOREIGN KEY ("topic_id")
-  REFERENCES "topics" ("id")
+  REFERENCES "user_topics" ("id")
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
@@ -107,7 +107,7 @@ CREATE TABLE "sessions" (
   "is_approved"   BOOLEAN NOT NULL DEFAULT FALSE,
   "is_completed"  BOOLEAN NOT NULL DEFAULT FALSE,
   CONSTRAINT "sessionsTopicsFK" FOREIGN KEY ("topic_id")
-  REFERENCES "topics" ("id")
+  REFERENCES "user_topics" ("id")
   ON DELETE NO ACTION
   ON UPDATE CASCADE,
   CONSTRAINT "sessionsCredentialsFK1" FOREIGN KEY ("trainee_id")
@@ -169,9 +169,9 @@ CREATE TABLE "session_files" (
   ON UPDATE CASCADE
 );
 
-CREATE TABLE "notifications" (
-  "id" BIGSERIAL PRIMARY KEY,
-  "notif_type" TEXT NOT NULL,
-  "is_read" BOOLEAN NOT NULL DEFAULT FALSE
-  --add more stuff
-)
+-- ADD MORE STUFF
+-- CREATE TABLE "notifications" (
+--   "id" BIGSERIAL PRIMARY KEY,
+--   "notif_type" TEXT NOT NULL,
+--   "is_read" BOOLEAN NOT NULL DEFAULT FALSE
+-- )
