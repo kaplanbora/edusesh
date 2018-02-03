@@ -13,8 +13,6 @@ import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthenticatedRequest[A](val credentials: UserCredentials, request: Request[A]) extends WrappedRequest[A](request)
-
 class SessionController @Inject()(
     sessionDao: SessionDAO,
     authAction: AuthenticatedAction,
@@ -31,17 +29,13 @@ class SessionController @Inject()(
   }
 
   def updateSession(sessionId: Long) = instructorAction(parse.json).async { implicit request =>
-    sessionDao.getSession(sessionId).flatMap {
-      case Some(s) if s.instructorId == request.userId || s.traineeId == request.userId =>
-        request.body.validate[SessionUpdateForm].fold(
-          errors => {
-            Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
-          },
-          sessionForm => sessionDao.updateSession(sessionId, sessionForm)
-            .map(lines => Ok(Json.toJson(lines)))
-        )
-      case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
-    }
+    request.body.validate[SessionUpdateForm].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+      },
+      sessionForm => sessionDao.updateSession(request.userId, sessionId, sessionForm)
+        .map(lines => Ok(Json.obj("updated" -> (lines > 0))))
+    )
   }
 
   def createSession = traineeAction(parse.json).async { implicit request =>
@@ -49,7 +43,7 @@ class SessionController @Inject()(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
-      sessionForm => sessionDao.createSession(sessionForm)
+      sessionForm => sessionDao.createSession(request.userId, sessionForm)
         .map(id => Created(Json.toJson(id)))
     )
   }

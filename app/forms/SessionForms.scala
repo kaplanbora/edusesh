@@ -7,12 +7,10 @@ import util.DateFormats
 
 case class SessionForm(
     name: String,
-    traineeId: Long,
+    description: String,
     instructorId: Long,
     topicId: Long,
     date: LocalDateTime,
-    isApproved: Boolean,
-    isCompleted: Boolean
 )
 
 case class SessionUpdateForm(isApproved: Boolean, isCompleted: Boolean)

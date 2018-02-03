@@ -20,6 +20,7 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
   private class SessionTable(tag: Tag) extends Table[LiveSession](tag, "sessions") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name")
+    def description = column[String]("description")
     def traineeId = column[Long]("trainee_id")
     def instructorId = column[Long]("instructor_id")
     def topicId = column[Long]("topic_id")
@@ -27,7 +28,7 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     def isApproved = column[Boolean]("is_approved")
     def isCompleted = column[Boolean]("is_completed")
 
-    def * = (id, name, traineeId, instructorId, topicId, date, isApproved, isCompleted) <>
+    def * = (id, name, description, traineeId, instructorId, topicId, date, isApproved, isCompleted) <>
       ((LiveSession.apply _).tupled, LiveSession.unapply)
   }
 
@@ -128,9 +129,9 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       .headOption
   }
 
-  def createSession(form: SessionForm): Future[Long] = db.run {
+  def createSession(traineeId: Long, form: SessionForm): Future[Long] = db.run {
     (liveSessions returning liveSessions.map(_.id)) +=
-      LiveSession(-1, form.name, form.traineeId, form.instructorId, form.topicId, form.date, form.isApproved, form.isCompleted)
+      LiveSession(-1, form.name, form.description, traineeId, form.instructorId, form.topicId, form.date, false, false)
   }
 
   def createReport(sessionId: Long, form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
@@ -148,8 +149,8 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       SessionFile(-1, sessionId, form.name, form.link)
   }
 
-  def updateSession(id: Long, form: SessionUpdateForm): Future[Int] = db.run {
-    liveSessions.filter(_.id === id)
+  def updateSession(instructorId: Long, sessionId: Long, form: SessionUpdateForm): Future[Int] = db.run {
+    liveSessions.filter(sesh => sesh.instructorId === instructorId && sesh.id === sessionId)
       .map(session => (session.isApproved, session.isCompleted))
       .update((form.isApproved, form.isCompleted))
       .transactionally

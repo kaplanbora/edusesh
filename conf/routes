@@ -5,7 +5,6 @@
 # Map static resources from the /public folder to the /assets URL path
 GET           /assets/*file                      controllers.Assets.versioned(path="/public", file: Asset)
 
-GET           /users/sessions                    controllers.UserController.getSessions
 GET           /users/reports                     controllers.UserController.getReports
 GET           /users/reviews                     controllers.UserController.getReviews
 GET           /users/chats                       controllers.UserController.getConversations
@@ -34,9 +33,9 @@ POST          /chats                             controllers.ChatController.crea
 POST          /chats/:id/messages                controllers.ChatController.createMessage(id: Long)
 PATCH         /chats/:id                         controllers.ChatController.updateConversation(id: Long, removed: Boolean)
 
-GET           /sessions/:id                      controllers.SessionController.getSession(id: Long)
-PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
+GET           /sessions                          controllers.UserController.getSessions
 POST          /sessions                          controllers.SessionController.createSession
+PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
 
 GET           /sessions/:sid/reports/:rid        controllers.SessionController.getReport(sid: Long, rid: Long)
 POST          /sessions/:sid/reports             controllers.SessionController.createReport(sid: Long)

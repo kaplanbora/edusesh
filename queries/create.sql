@@ -15,7 +15,7 @@ CREATE TABLE "instructor_profiles" (
   "image_link"  TEXT,
   "hourly_rate" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "video_link"  TEXT,
-  "user_id"     BIGINT NOT NULL UNIQUE,
+  "user_id"     BIGINT           NOT NULL UNIQUE,
   CONSTRAINT "profilesCredentialsFK" FOREIGN KEY ("user_id")
   REFERENCES "user_credentials" ("id")
   ON DELETE CASCADE
@@ -65,9 +65,9 @@ CREATE TABLE "trainee_profiles" (
 );
 
 CREATE TABLE "conversations" (
-  "id"       BIGSERIAL PRIMARY KEY,
-  "user1_id" BIGINT NOT NULL,
-  "user2_id" BIGINT NOT NULL,
+  "id"            BIGSERIAL PRIMARY KEY,
+  "user1_id"      BIGINT  NOT NULL,
+  "user2_id"      BIGINT  NOT NULL,
   "user1_removed" BOOLEAN NOT NULL DEFAULT FALSE,
   "user2_removed" BOOLEAN NOT NULL DEFAULT FALSE,
   CONSTRAINT "accountsUQ" UNIQUE ("user1_id", "user2_id"),
@@ -100,12 +100,13 @@ CREATE TABLE "messages" (
 CREATE TABLE "sessions" (
   "id"            BIGSERIAL PRIMARY KEY,
   "name"          TEXT      NOT NULL,
+  "description"   TEXT      NOT NULL,
   "trainee_id"    BIGINT    NOT NULL,
   "instructor_id" BIGINT    NOT NULL,
   "topic_id"      BIGINT    NOT NULL,
   "date"          TIMESTAMP NOT NULL,
-  "is_approved"   BOOLEAN NOT NULL DEFAULT FALSE,
-  "is_completed"  BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_approved"   BOOLEAN   NOT NULL DEFAULT FALSE,
+  "is_completed"  BOOLEAN   NOT NULL DEFAULT FALSE,
   CONSTRAINT "sessionsTopicsFK" FOREIGN KEY ("topic_id")
   REFERENCES "user_topics" ("id")
   ON DELETE NO ACTION
@@ -126,7 +127,7 @@ CREATE TABLE "reports" (
   "user_id"     BIGINT    NOT NULL,
   "title"       TEXT      NOT NULL,
   "description" TEXT      NOT NULL,
-  "is_resolved" BOOLEAN NOT NULL DEFAULT FALSE,
+  "is_resolved" BOOLEAN   NOT NULL DEFAULT FALSE,
   "date"        TIMESTAMP NOT NULL,
   CONSTRAINT "reportsSessionsFK" FOREIGN KEY ("session_id")
   REFERENCES "sessions" ("id")

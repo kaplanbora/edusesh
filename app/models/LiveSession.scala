@@ -8,6 +8,7 @@ import util.DateFormats
 case class LiveSession(
     id: Long,
     name: String,
+    description: String,
     traineeId: Long,
     instructorId: Long,
     topicId: Long,
