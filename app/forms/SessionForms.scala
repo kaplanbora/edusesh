@@ -21,7 +21,6 @@ case class ReportForm(
 )
 
 case class ReviewForm(
-    traineeId: Long,
     rating: Double,
     title: String,
     comment: Option[String],

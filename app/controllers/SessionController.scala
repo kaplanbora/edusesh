@@ -89,7 +89,7 @@ class SessionController @Inject()(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
           },
-          reviewForm => sessionDao.createReview(sessionId, reviewForm, LocalDateTime.now())
+          reviewForm => sessionDao.createReview(request.credentials.id, sessionId, reviewForm, LocalDateTime.now())
             .map(id => Created(Json.toJson(id)))
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
@@ -103,17 +103,18 @@ class SessionController @Inject()(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
           },
-          reviewForm => sessionDao.updateReview(reviewId, reviewForm)
-            .map(lines => Ok(Json.toJson(lines)))
+          reviewForm => sessionDao.updateReview(request.credentials.id, reviewId, reviewForm)
+            .map(lines => Ok(Json.obj("updated" -> (lines > 0))))
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
   }
 
-  def removeReview(sessionId: Long, reviewId: Long) = authAction(parse.json).async { implicit request =>
+  def removeReview(sessionId: Long, reviewId: Long) = authAction.async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
       case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
-        sessionDao.removeReview(reviewId).map(lines => Ok(Json.toJson(lines)))
+        sessionDao.removeReview(request.credentials.id, reviewId)
+          .map(lines => Ok(Json.obj("deleted" -> (lines > 0))))
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
   }

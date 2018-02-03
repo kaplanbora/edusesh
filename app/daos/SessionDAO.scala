@@ -139,9 +139,9 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       Report(-1, sessionId, traineeId, form.title, form.description, false, date)
   }
 
-  def createReview(sessionId: Long, form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
+  def createReview(traineeId: Long, sessionId: Long, form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
     (reviews returning reviews.map(_.id)) +=
-      Review(-1, sessionId, form.traineeId, form.rating, form.title, form.comment, date)
+      Review(-1, sessionId, traineeId, form.rating, form.title, form.comment, date)
   }
 
   def createSessionFile(sessionId: Long, form: SessionFileForm, date: LocalDateTime): Future[Long] = db.run {
@@ -156,8 +156,8 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       .transactionally
   }
 
-  def updateReview(id: Long, form: ReviewUpdateForm): Future[Int] = db.run {
-    reviews.filter(_.id === id)
+  def updateReview(traineeId: Long, reviewId: Long, form: ReviewUpdateForm): Future[Int] = db.run {
+    reviews.filter(review => review.id === reviewId && review.traineeId === traineeId)
       .map(review => (review.rating, review.title, review.comment))
       .update((form.rating, form.title, form.comment))
       .transactionally
@@ -170,8 +170,8 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       .transactionally
   }
 
-  def removeReview(id: Long): Future[Int] = db.run {
-    reviews.filter(_.id === id)
+  def removeReview(traineeId: Long, reviewId: Long): Future[Int] = db.run {
+    reviews.filter(review => review.id === reviewId && review.traineeId === traineeId)
       .delete
       .transactionally
   }
