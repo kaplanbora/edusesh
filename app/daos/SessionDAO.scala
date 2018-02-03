@@ -134,9 +134,9 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       LiveSession(-1, form.name, form.description, traineeId, form.instructorId, form.topicId, form.date, false, false)
   }
 
-  def createReport(sessionId: Long, form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
+  def createReport(traineeId: Long, sessionId: Long, form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
     (reports returning reports.map(_.id)) +=
-      Report(-1, sessionId, form.userId, form.title, form.description, form.isResolved, date)
+      Report(-1, sessionId, traineeId, form.title, form.description, false, date)
   }
 
   def createReview(sessionId: Long, form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {

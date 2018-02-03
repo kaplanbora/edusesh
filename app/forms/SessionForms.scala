@@ -16,10 +16,8 @@ case class SessionForm(
 case class SessionUpdateForm(isApproved: Boolean, isCompleted: Boolean)
 
 case class ReportForm(
-    userId: Long,
     title: String,
     description: String,
-    isResolved: Boolean,
 )
 
 case class ReviewForm(

@@ -38,12 +38,12 @@ class SessionController @Inject()(
     )
   }
 
-  def createSession = traineeAction(parse.json).async { implicit request =>
+  def createSession = authAction(parse.json).async { implicit request =>
     request.body.validate[SessionForm].fold(
       errors => {
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
-      sessionForm => sessionDao.createSession(request.userId, sessionForm)
+      sessionForm => sessionDao.createSession(request.credentials.id, sessionForm)
         .map(id => Created(Json.toJson(id)))
     )
   }
@@ -139,12 +139,12 @@ class SessionController @Inject()(
 
   def createReport(sessionId: Long) = authAction(parse.json).async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
-      case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
+      case Some(s) if s.traineeId == request.credentials.id =>
         request.body.validate[ReportForm].fold(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
           },
-          reportForm => sessionDao.createReport(sessionId, reportForm, LocalDateTime.now())
+          reportForm => sessionDao.createReport(request.credentials.id, sessionId, reportForm, LocalDateTime.now())
             .map(id => Created(Json.toJson(id)))
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))

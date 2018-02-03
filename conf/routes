@@ -37,7 +37,6 @@ GET           /sessions                          controllers.UserController.getS
 POST          /sessions                          controllers.SessionController.createSession
 PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
 
-GET           /sessions/:sid/reports/:rid        controllers.SessionController.getReport(sid: Long, rid: Long)
 POST          /sessions/:sid/reports             controllers.SessionController.createReport(sid: Long)
 
 GET           /sessions/:sid/files               controllers.SessionController.getFiles(sid: Long)
