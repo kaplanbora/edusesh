@@ -17,7 +17,7 @@ class GlobalFilter @Inject()(implicit ec: ExecutionContext) extends EssentialFil
   override def apply(next: EssentialAction) = EssentialAction { request =>
     next(request).map { result =>
       result.withHeaders("Access-Control-Allow-Origin" -> "*")
-      result.withHeaders("Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE")
+      result.withHeaders("Access-Control-Allow-Methods" -> "GET, POST, OPTIONS, DELETE, PUT, PATCH")
     }
   }
 }

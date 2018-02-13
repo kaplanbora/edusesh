@@ -2,6 +2,7 @@ package forms
 
 import play.api.libs.json.Json
 
+case class CheckEmailForm(email: String)
 case class UserCredentialsForm(email: String, password: String)
 case class TraineeProfileForm(firstName: Option[String], lastName: Option[String], imageLink: Option[String])
 case class InstructorProfileForm(
@@ -15,6 +16,7 @@ case class InstructorProfileForm(
 )
 
 object UserForms {
+  implicit val checkEmailFormFormat = Json.format[CheckEmailForm]
   implicit val credentialsFormFormat = Json.format[UserCredentialsForm]
   implicit val traineeProfileFormFormat = Json.format[TraineeProfileForm]
   implicit val instructorProfileFormFormat = Json.format[InstructorProfileForm]

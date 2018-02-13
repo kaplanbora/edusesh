@@ -50,6 +50,18 @@ class UserController @Inject()(
     }
   }
 
+  def checkEmail = Action(parse.json).async { implicit request =>
+    request.body.validate[CheckEmailForm].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+      },
+      form => {
+        userDao.emailExists(form.email)
+          .map(exists => Ok(Json.obj("email-exists" -> exists)))
+      }
+    )
+  }
+
   def registerTrainee(body: JsValue): Future[Result] = {
     body.validate[UserCredentialsForm].fold(
       errors => {
@@ -204,6 +216,18 @@ class UserController @Inject()(
   def delete = authAction.async { implicit request =>
     userDao.deleteUser(request.credentials.id)
       .map(lines => Ok(Json.obj("deleted" -> lines)))
+  }
+
+  def headers = List(
+    "Access-Control-Max-Age" -> "3600",
+    "Access-Control-Allow-Headers" -> "Origin, Content-Type, Accept, Authorization, JWT",
+    "Access-Control-Allow-Credentials" -> "true"
+  )
+
+  def rootOptions = options("/")
+
+  def options(url: String) = Action { request =>
+    NoContent.withHeaders(headers : _*)
   }
 }
 

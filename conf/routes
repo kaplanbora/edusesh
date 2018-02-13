@@ -18,6 +18,7 @@ GET           /users/:id/topics                  controllers.TopicController.get
 
 POST          /users/login                       controllers.UserController.login
 POST          /users/register                    controllers.UserController.register(role: String)
+POST          /users/email                       controllers.UserController.checkEmail
 POST          /users/topics                      controllers.TopicController.addTopic
 
 PUT           /users/profile                     controllers.UserController.updateProfile
@@ -46,6 +47,9 @@ GET           /sessions/:sid/reviews             controllers.SessionController.g
 POST          /sessions/:sid/reviews             controllers.SessionController.createReview(sid: Long)
 PUT           /sessions/:sid/reviews/:rid        controllers.SessionController.updateReview(sid: Long, rid: Long)
 DELETE        /sessions/:sid/reviews/:rid        controllers.SessionController.removeReview(sid: Long, rid: Long)
+
+OPTIONS       /                                  controllers.UserController.rootOptions
+OPTIONS       /*url                              controllers.UserController.options(url: String)
 
 # Admin
 PUT           /sessions/:sid/reports/:rid        controllers.SessionController.resolveReport(sid: Long, rid: Long)
