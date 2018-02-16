@@ -57,7 +57,7 @@ class UserController @Inject()(
       },
       form => {
         userDao.emailExists(form.email)
-          .map(exists => Ok(Json.obj("email-exists" -> exists)))
+          .map(exists => Ok(Json.obj("emailExists" -> exists)))
       }
     )
   }
@@ -68,13 +68,13 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       form => {
-        val user = for {
+        val newUser = for {
           userId <- userDao.createUser(form, TraineeRole, currentTime)
           _ <- userDao.createTraineeProfile(userId)
           newUser <- userDao.getCredentialsById(userId)
         } yield newUser
-        user.map {
-          case Some(u) => Created(Json.toJson(u))
+        newUser.map {
+          case Some(user) => Created(Json.obj("token" -> Token.generate(user)))
           case None => BadRequest(Json.obj("error" -> "Creation failed."))
         }
       }
@@ -87,13 +87,13 @@ class UserController @Inject()(
         Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
       },
       form => {
-        val user = for {
+        val newUser = for {
           userId <- userDao.createUser(form, InstructorRole, currentTime)
           _ <- userDao.createInstructorProfile(userId)
           newUser <- userDao.getCredentialsById(userId)
         } yield newUser
-        user.map {
-          case Some(u) => Created(Json.toJson(u))
+        newUser.map {
+          case Some(user) => Created(Json.obj("token" -> Token.generate(user)))
           case None => BadRequest(Json.obj("error" -> "Creation failed."))
         }
       }
@@ -227,7 +227,7 @@ class UserController @Inject()(
   def rootOptions = options("/")
 
   def options(url: String) = Action { request =>
-    NoContent.withHeaders(headers : _*)
+    NoContent.withHeaders(headers: _*)
   }
 }
 
