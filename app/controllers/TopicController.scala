@@ -53,11 +53,11 @@ class TopicController @Inject()(
       },
       topic => topicDao.getUserTopic(topic.name).flatMap {
         case Some(t) => topicDao.addInstructorTopic(request.userId, t.id)
-          .map(id => Created(Json.toJson(id)))
+          .map(id => Created(Json.obj("id" -> id)))
         case None => for {
           id <- topicDao.createUserTopic(topic)
           addedId <- topicDao.addInstructorTopic(request.userId, id)
-        } yield Created(Json.toJson(addedId))
+        } yield Created(Json.obj("id" -> addedId))
       }
     )
   }

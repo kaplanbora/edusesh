@@ -176,3 +176,17 @@ CREATE TABLE "session_files" (
 --   "notif_type" TEXT NOT NULL,
 --   "is_read" BOOLEAN NOT NULL DEFAULT FALSE
 -- )
+
+INSERT INTO "main_topics" ("name") VALUES
+('Business'),
+('Office Productivity'),
+('Personal Development'),
+('Music'),
+('Design'),
+('Marketing'),
+('Lifestyle'),
+('Photography'),
+('Health & Fitness'),
+('Teacher Training'),
+('Academics'),
+('Language');

@@ -2,13 +2,12 @@ package daos
 
 import javax.inject.{Inject, Singleton}
 
-import forms.UserTopicForm
+import forms.{SelfTopic, UserTopicForm}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.PostgresProfile
 import models._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 @Singleton
 class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: ExecutionContext) {
@@ -80,4 +79,14 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     userTopicTable.filter(_.id in topicIds)
       .result
   }
+
+  def getSelfTopics(instructorId: Long): Future[Seq[SelfTopic]] = db.run {
+    val joinedTopics = for {
+      instructorTopics <- instructorTopicTable.filter(_.instructorId === instructorId)
+      topicNames <- userTopicTable.filter(_.id === instructorTopics.topicId)
+    } yield instructorTopics.id -> topicNames.name
+    joinedTopics.result
+  }.map(result => result.map {
+    case (id, name) => SelfTopic(id, name)
+  })
 }
