@@ -35,6 +35,7 @@ POST          /chats/:id/messages                controllers.ChatController.crea
 PATCH         /chats/:id                         controllers.ChatController.updateConversation(id: Long, removed: Boolean)
 
 GET           /sessions                          controllers.UserController.getSessions
+GET           /sessions/:id                      controllers.SessionController.getSession(id: Long)
 POST          /sessions                          controllers.SessionController.createSession
 PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
 DELETE        /sessions/:id                      controllers.SessionController.deleteSession(id: Long)
