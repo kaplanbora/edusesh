@@ -27,8 +27,9 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     def date = column[LocalDateTime]("date")
     def isApproved = column[Boolean]("is_approved")
     def isCompleted = column[Boolean]("is_completed")
+    def isDeleted = column[Boolean]("is_deleted")
 
-    def * = (id, name, description, traineeId, instructorId, topicId, date, isApproved, isCompleted) <>
+    def * = (id, name, description, traineeId, instructorId, topicId, date, isApproved, isCompleted, isDeleted) <>
       ((LiveSession.apply _).tupled, LiveSession.unapply)
   }
 
@@ -131,7 +132,7 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
 
   def createSession(traineeId: Long, form: SessionForm): Future[Long] = db.run {
     (liveSessions returning liveSessions.map(_.id)) +=
-      LiveSession(-1, form.name, form.description, traineeId, form.instructorId, form.topicId, form.date, false, false)
+      LiveSession(-1, form.name, form.description, traineeId, form.instructorId, form.topicId, form.date, false, false, false)
   }
 
   def createReport(traineeId: Long, sessionId: Long, form: ReportForm, date: LocalDateTime): Future[Long] = db.run {
@@ -153,6 +154,14 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
     liveSessions.filter(sesh => sesh.instructorId === instructorId && sesh.id === sessionId)
       .map(session => (session.isApproved, session.isCompleted))
       .update((form.isApproved, form.isCompleted))
+      .transactionally
+  }
+
+  def deleteSession(sessionId: Long, userId: Long): Future[Int] = db.run {
+    liveSessions.filter(_.id === sessionId)
+      .filter(session => session.instructorId === userId || session.traineeId === userId)
+      .map(_.isDeleted)
+      .update(true)
       .transactionally
   }
 

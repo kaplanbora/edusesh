@@ -28,6 +28,11 @@ class SessionController @Inject()(
     }
   }
 
+  def deleteSession(sessionId: Long) = authAction.async { implicit request =>
+    sessionDao.deleteSession(sessionId, request.credentials.id)
+      .map(lines => Ok(Json.obj("deleted" -> (lines > 0))))
+  }
+
   def updateSession(sessionId: Long) = instructorAction(parse.json).async { implicit request =>
     request.body.validate[SessionUpdateForm].fold(
       errors => {

@@ -37,6 +37,7 @@ PATCH         /chats/:id                         controllers.ChatController.upda
 GET           /sessions                          controllers.UserController.getSessions
 POST          /sessions                          controllers.SessionController.createSession
 PUT           /sessions/:id                      controllers.SessionController.updateSession(id: Long)
+DELETE        /sessions/:id                      controllers.SessionController.deleteSession(id: Long)
 
 POST          /sessions/:sid/reports             controllers.SessionController.createReport(sid: Long)
 

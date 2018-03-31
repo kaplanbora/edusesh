@@ -14,7 +14,8 @@ case class LiveSession(
     topicId: Long,
     date: LocalDateTime,
     isApproved: Boolean,
-    isCompleted: Boolean
+    isCompleted: Boolean,
+    isDeleted: Boolean
 )
 
 object LiveSession extends DateFormats {

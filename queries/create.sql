@@ -107,6 +107,7 @@ CREATE TABLE "sessions" (
   "date"          TIMESTAMP NOT NULL,
   "is_approved"   BOOLEAN   NOT NULL DEFAULT FALSE,
   "is_completed"  BOOLEAN   NOT NULL DEFAULT FALSE,
+  "is_deleted"    BOOLEAN   NOT NULL DEFAULT FALSE,
   CONSTRAINT "sessionsTopicsFK" FOREIGN KEY ("topic_id")
   REFERENCES "user_topics" ("id")
   ON DELETE NO ACTION
@@ -178,15 +179,15 @@ CREATE TABLE "session_files" (
 -- )
 
 INSERT INTO "main_topics" ("name") VALUES
-('Business'),
-('Office Productivity'),
-('Personal Development'),
-('Music'),
-('Design'),
-('Marketing'),
-('Lifestyle'),
-('Photography'),
-('Health & Fitness'),
-('Teacher Training'),
-('Academics'),
-('Language');
+  ('Business'),
+  ('Office Productivity'),
+  ('Personal Development'),
+  ('Music'),
+  ('Design'),
+  ('Marketing'),
+  ('Lifestyle'),
+  ('Photography'),
+  ('Health & Fitness'),
+  ('Teacher Training'),
+  ('Academics'),
+  ('Language');
