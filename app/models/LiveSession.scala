@@ -15,7 +15,8 @@ case class LiveSession(
     date: LocalDateTime,
     isApproved: Boolean,
     isCompleted: Boolean,
-    isDeleted: Boolean
+    isDeleted: Boolean,
+    isStarted: Boolean
 )
 
 object LiveSession extends DateFormats {

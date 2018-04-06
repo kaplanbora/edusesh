@@ -10,20 +10,20 @@ case class SessionForm(
     description: String,
     instructorId: Long,
     topicId: Long,
-    date: LocalDateTime,
+    date: LocalDateTime
 )
 
-case class SessionUpdateForm(isApproved: Boolean, isCompleted: Boolean)
+case class SessionUpdateForm(isApproved: Boolean, isCompleted: Boolean, isStarted: Boolean)
 
 case class ReportForm(
     title: String,
-    description: String,
+    description: String
 )
 
 case class ReviewForm(
     rating: Double,
     title: String,
-    comment: Option[String],
+    comment: Option[String]
 )
 
 case class ReviewUpdateForm(rating: Double, title: String, comment: Option[String])

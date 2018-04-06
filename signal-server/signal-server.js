@@ -4,6 +4,13 @@ const http = require('http');
 const WebSocketServer = require('websocket').server;
 
 var connections = [];
+/*
+ {
+ userId
+ sessionId
+ isStarted
+ }
+ */
 
 function log(text) {
   const time = new Date();

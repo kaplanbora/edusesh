@@ -108,6 +108,7 @@ CREATE TABLE "sessions" (
   "is_approved"   BOOLEAN   NOT NULL DEFAULT FALSE,
   "is_completed"  BOOLEAN   NOT NULL DEFAULT FALSE,
   "is_deleted"    BOOLEAN   NOT NULL DEFAULT FALSE,
+  "is_started"    BOOLEAN   NOT NULL DEFAULT FALSE,
   CONSTRAINT "sessionsTopicsFK" FOREIGN KEY ("topic_id")
   REFERENCES "user_topics" ("id")
   ON DELETE NO ACTION
