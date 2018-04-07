@@ -4,19 +4,29 @@ const http = require('http');
 const WebSocketServer = require('websocket').server;
 
 var connections = [];
+var sessions = [];
 
 const setUserReady = (socket, userId) => {
-  if (socket.session.traineeId === userId) {
-    socket.traineeReady = true;
-    sendToTarget(socket.session.instructorId, {type: "target_is_ready"});
-  } else if (socket.session.instructorId === userId) {
-   socket.instructorReady = true;
-   sendToTarget(socket.session.traineeId, {type: "target_is_ready"});
+  const session = sessions.filter(s => s.id == socket.session)[0];
+  if (socket.role === "trainee") {
+    session.traineeReady = true;
+    sendToTarget(socket.target, {type: "target_is_ready"}, socket.owner);
+  } else {
+    session.instructorReady = true;
+    sendToTarget(socket.target, {type: "target_is_ready"}, socket.owner);
   }
 
-  if (socket.traineeReady && socket.instructorReady) {
-    sendToTarget(socket.session.instructorId, {type: "start_session"});
-  }
+  setTimeout(() => {
+    if (session.traineeReady && session.instructorReady) {
+      session.startDate = new Date();
+      const message = {
+        type: "start_session",
+        payload: session.startDate
+      };
+      sendToTarget(socket.owner, message, socket.owner);
+      sendToTarget(socket.target, message, socket.owner);
+    }
+  }, 800);
 }
 
 const log = text => {
@@ -24,10 +34,11 @@ const log = text => {
   console.log("[" + time.toLocaleTimeString() + "] " + text);
 }
 
-const sendToTarget = (target, message) => {
+const sendToTarget = (target, message, owner) => {
   const payload = JSON.stringify(message);
+  console.log(`[SENDING]: Type: ${message.type} Target: ${target} Owner: ${owner}`);
   connections
-    .filter(connection => connection.user.credentials.id === target)
+    .filter(connection => connection.owner == target)
     .forEach(connection => connection.sendUTF(payload));
 }
 
@@ -54,10 +65,22 @@ wsServer.on("request", (request) => {
       return;
     }
     const message = JSON.parse(data.utf8Data);       
+    //connections.forEach(socket => console.log(`[RECEIVED-BEFORE] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
+    sessions.forEach(s => console.log(`[SESSIONS-BEFORE] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
     switch (message.type) {
       case "initiate":
+        socket.owner = message.payload.owner;
+        socket.target = message.payload.target;
         socket.session = message.payload.session;
-        socket.user = message.payload.user;
+        socket.role = message.payload.role;
+        if (sessions.filter(session => session.id == message.payload.session).length == 0) {
+          sessions.push({
+            id: message.payload.session,
+            instructorReady: false,
+            traineeReady: false,
+            startDate: null
+          });
+        }
         break;
       case "user_ready":
         setUserReady(socket, message.payload);
@@ -70,6 +93,8 @@ wsServer.on("request", (request) => {
         log(`Received ${message.type} from ${message.sender} to ${message.target}.`);
         sendToTarget(message.target, message);
     }
+    //connections.forEach(socket => console.log(`[RECEIVED-AFTER] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
+    sessions.forEach(s => console.log(`[SESSIONS-AFTER] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
   });
 
   socket.on("close", (reason, description) => {
