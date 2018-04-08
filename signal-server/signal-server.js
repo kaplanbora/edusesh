@@ -73,21 +73,43 @@ wsServer.on("request", (request) => {
         socket.target = message.payload.target;
         socket.session = message.payload.session;
         socket.role = message.payload.role;
-        if (sessions.filter(session => session.id == message.payload.session).length == 0) {
+        const session = sessions.filter(session => session.id == message.payload.session)[0];
+        if (!session) {
           sessions.push({
             id: message.payload.session,
             instructorReady: false,
             traineeReady: false,
-            startDate: null
+            startDate: null,
+            instructorPresent: socket.role === "instructor",
+            traineePresent: socket.role === "trainee"
           });
+        } else {
+
+          if (socket.role === "instructor") {
+            session.instructorPresent = true;
+          } else {
+            session.traineePresent = true;
+          }
+
+          if (session.instructorPresent && session.traineePresent) {
+            const message = {
+              type: "start_session",
+              payload: session.startDate ? session.startDate : new Date()
+            };
+            if (socket.role === "instructor") {
+              sendToTarget(socket.owner, message, socket.owner);
+            } else {
+              sendToTarget(socket.target, message, socket.owner);
+            }
+          }
+
+
+
+
         }
         break;
       case "user_ready":
         setUserReady(socket, message.payload);
-        break;
-      case "message":
-        message.text = message.text.replace(/(<([^>]+)>)/ig, "");
-        sendToTarget(message.target, message);
         break;
       default:
         log(`Received ${message.type} from ${message.sender} to ${message.target}.`);
@@ -99,6 +121,12 @@ wsServer.on("request", (request) => {
 
   socket.on("close", (reason, description) => {
     connections = connections.filter(connection => connection.connected);
+    const session = sessions.filter(session => session.id == socket.session)[0];
+    if (socket.role === "instructor") {
+      session.instructorPresent = false;
+    } else {
+      session.traineePresent = false;
+    }
     log(`Connection lost from ${socket.remoteAddress}: ${reason}. \n\t${description}`);
   });
 });
