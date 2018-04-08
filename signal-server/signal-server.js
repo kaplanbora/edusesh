@@ -91,7 +91,7 @@ wsServer.on("request", (request) => {
         break;
       default:
         log(`Received ${message.type} from ${message.sender} to ${message.target}.`);
-        sendToTarget(message.target, message);
+        sendToTarget(socket.target, message);
     }
     //connections.forEach(socket => console.log(`[RECEIVED-AFTER] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
     sessions.forEach(s => console.log(`[SESSIONS-AFTER] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
