@@ -66,7 +66,7 @@ wsServer.on("request", (request) => {
     }
     const message = JSON.parse(data.utf8Data);       
     //connections.forEach(socket => console.log(`[RECEIVED-BEFORE] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
-    sessions.forEach(s => console.log(`[SESSIONS-BEFORE] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
+    //sessions.forEach(s => console.log(`[SESSIONS-BEFORE] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
     switch (message.type) {
       case "initiate":
         socket.owner = message.payload.owner;
@@ -112,11 +112,11 @@ wsServer.on("request", (request) => {
         setUserReady(socket, message.payload);
         break;
       default:
-        log(`Received ${message.type} from ${message.sender} to ${message.target}.`);
-        sendToTarget(socket.target, message);
+        log(`Received ${message.type} at ${socket.owner} to ${socket.target} with payload ${message.payload}.`);
+        sendToTarget(socket.target, message, socket.owner);
     }
     //connections.forEach(socket => console.log(`[RECEIVED-AFTER] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
-    sessions.forEach(s => console.log(`[SESSIONS-AFTER] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
+    //sessions.forEach(s => console.log(`[SESSIONS-AFTER] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
   });
 
   socket.on("close", (reason, description) => {
