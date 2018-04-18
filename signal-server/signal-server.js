@@ -91,10 +91,10 @@ wsServer.on("request", (request) => {
             session.traineePresent = true;
           }
 
-          if (session.instructorPresent && session.traineePresent) {
+          if (session.instructorPresent && session.traineePresent && session.startDate) {
             const message = {
               type: "start_session",
-              payload: session.startDate ? session.startDate : new Date()
+              payload: new Date()
             };
             if (socket.role === "instructor") {
               sendToTarget(socket.owner, message, socket.owner);
