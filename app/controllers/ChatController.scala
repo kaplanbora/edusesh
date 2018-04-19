@@ -18,8 +18,8 @@ class ChatController @Inject()(
     cc: ControllerComponents
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
-  def getMessages(conversationId: Long) = authAction.async { implicit request =>
-    chatDao.getMessagesForConversation(conversationId)
+  def getMessages(sessionId: Long) = authAction.async { implicit request =>
+    chatDao.getMessagesForConversation(sessionId)
       .map(conversations => Ok(Json.toJson(conversations)))
   }
 
@@ -45,6 +45,18 @@ class ChatController @Inject()(
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Conversation doesn't exists or invalid authentication.")))
     }
+  }
+
+  def sendMessage(sessionId: Long) = authAction(parse.json).async { implicit request =>
+    request.body.validate[MessageForm].fold(
+      errors => {
+        Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
+      },
+      message => {
+        chatDao.createMessage(sessionId, request.credentials.id, message, LocalDateTime.now())
+          .map(id => Created(Json.toJson(id)))
+      }
+    )
   }
 
   // When a user deletes a conversation its not removed but hidden from them

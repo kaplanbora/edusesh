@@ -31,7 +31,7 @@ GET           /topics                            controllers.TopicController.get
 
 GET           /chats/:id/messages                controllers.ChatController.getMessages(id: Long)
 POST          /chats                             controllers.ChatController.createConversation(target: Long)
-POST          /chats/:id/messages                controllers.ChatController.createMessage(id: Long)
+POST          /chats/:id/messages                controllers.ChatController.sendMessage(id: Long)
 PATCH         /chats/:id                         controllers.ChatController.updateConversation(id: Long, removed: Boolean)
 
 GET           /sessions                          controllers.UserController.getSessions

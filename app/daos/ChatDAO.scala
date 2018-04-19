@@ -31,11 +31,11 @@ class ChatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
   private class MessageTable(tag: Tag) extends Table[Message](tag, "messages") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
     def senderId = column[Long]("sender_id")
-    def conversationId = column[Long]("conversation_id")
+    def sessionId = column[Long]("session_id")
     def body = column[String]("body")
     def date = column[LocalDateTime]("date")
 
-    def * = (id, senderId, conversationId, body, date) <>
+    def * = (id, senderId, sessionId, body, date) <>
       ((Message.apply _).tupled, Message.unapply)
   }
 
@@ -57,12 +57,12 @@ class ChatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     ).result.headOption
   }
 
-  def getConversation(conversationId: Long): Future[Option[Conversation]] = db.run {
-    conversationTable.filter(_.id === conversationId).result.headOption
+  def getConversation(sessionId: Long): Future[Option[Conversation]] = db.run {
+    conversationTable.filter(_.id === sessionId).result.headOption
   }
 
-  def getMessagesForConversation(conversationId: Long): Future[Seq[Message]] = db.run {
-    messageTable.filter(_.conversationId === conversationId).result
+  def getMessagesForConversation(sessionId: Long): Future[Seq[Message]] = db.run {
+    messageTable.filter(_.sessionId === sessionId).result
   }
 
   def getConversationsForUser(userId: Long): Future[Seq[Conversation]] = db.run {
@@ -76,9 +76,9 @@ class ChatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
       Conversation(-1, userId1, userId2, false, false)
   }
 
-  def createMessage(conversationId: Long, senderId: Long, form: MessageForm, date: LocalDateTime): Future[Long] = db.run {
+  def createMessage(sessionId: Long, senderId: Long, form: MessageForm, date: LocalDateTime): Future[Long] = db.run {
     (messageTable returning messageTable.map(_.id)) +=
-      Message(-1, senderId, conversationId, form.body, date)
+      Message(-1, senderId, sessionId, form.body, date)
   }
 
   def updateConversation(form: ConversationForm): Future[Int] = db.run {
@@ -89,15 +89,15 @@ class ChatDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
       .transactionally
   }
 
-  def removeForUser1(conversationId: Long): Future[Int] = db.run {
-    conversationTable.filter(_.id === conversationId)
+  def removeForUser1(sessionId: Long): Future[Int] = db.run {
+    conversationTable.filter(_.id === sessionId)
       .map(_.userRemoved1)
       .update(true)
       .transactionally
   }
 
-  def removeForUser2(conversationId: Long): Future[Int] = db.run {
-    conversationTable.filter(_.id === conversationId)
+  def removeForUser2(sessionId: Long): Future[Int] = db.run {
+    conversationTable.filter(_.id === sessionId)
       .map(_.userRemoved2)
       .update(true)
       .transactionally
