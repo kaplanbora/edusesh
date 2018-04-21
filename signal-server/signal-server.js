@@ -68,6 +68,11 @@ wsServer.on("request", (request) => {
     //connections.forEach(socket => console.log(`[RECEIVED-BEFORE] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
     //sessions.forEach(s => console.log(`[SESSIONS-BEFORE] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
     switch (message.type) {
+	  case "end-session":
+		const answer = {type: "hang-up"};
+		sendToTarget(socket.owner, answer, socket.target);
+		sendToTarget(socket.target, answer, socket.answer);
+		break;
       case "initiate":
         socket.owner = message.payload.owner;
         socket.target = message.payload.target;
@@ -102,10 +107,6 @@ wsServer.on("request", (request) => {
               sendToTarget(socket.target, message, socket.owner);
             }
           }
-
-
-
-
         }
         break;
       case "user_ready":
