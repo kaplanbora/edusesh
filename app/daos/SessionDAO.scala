@@ -166,8 +166,8 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       .transactionally
   }
 
-  def updateReview(traineeId: Long, reviewId: Long, form: ReviewUpdateForm): Future[Int] = db.run {
-    reviews.filter(review => review.id === reviewId && review.traineeId === traineeId)
+  def updateReview(traineeId: Long, sessionId: Long, form: ReviewUpdateForm): Future[Int] = db.run {
+    reviews.filter(review => review.sessionId === sessionId && review.traineeId === traineeId)
       .map(review => (review.rating, review.title, review.comment))
       .update((form.rating, form.title, form.comment))
       .transactionally

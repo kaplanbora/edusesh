@@ -109,14 +109,14 @@ class SessionController @Inject()(
     }
   }
 
-  def updateReview(sessionId: Long, reviewId: Long) = authAction(parse.json).async { implicit request =>
+  def updateReview(sessionId: Long) = authAction(parse.json).async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
       case Some(s) if s.instructorId == request.credentials.id || s.traineeId == request.credentials.id =>
         request.body.validate[ReviewUpdateForm].fold(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
           },
-          reviewForm => sessionDao.updateReview(request.credentials.id, reviewId, reviewForm)
+          reviewForm => sessionDao.updateReview(request.credentials.id, sessionId, reviewForm)
             .map(lines => Ok(Json.obj("updated" -> (lines > 0))))
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))

@@ -47,7 +47,7 @@ POST          /sessions/:sid/files               controllers.SessionController.c
 
 GET           /sessions/:sid/reviews             controllers.SessionController.getReview(sid: Long)
 POST          /sessions/:sid/reviews             controllers.SessionController.createReview(sid: Long)
-PUT           /sessions/:sid/reviews/:rid        controllers.SessionController.updateReview(sid: Long, rid: Long)
+PUT           /sessions/:sid/reviews             controllers.SessionController.updateReview(sid: Long)
 DELETE        /sessions/:sid/reviews/:rid        controllers.SessionController.removeReview(sid: Long, rid: Long)
 
 OPTIONS       /                                  controllers.UserController.rootOptions
