@@ -18,7 +18,7 @@ class SessionController @Inject()(
     authAction: AuthenticatedAction,
     instructorAction: InstructorAction,
     traineeAction: TraineeAction,
-    cc: ControllerComponents,
+    cc: ControllerComponents
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def getSession(sessionId: Long) = authAction.async { implicit request =>
@@ -99,8 +99,11 @@ class SessionController @Inject()(
           errors => {
             Future.successful(BadRequest(Json.obj("error" -> JsError.toJson(errors))))
           },
-          reviewForm => sessionDao.createReview(request.credentials.id, sessionId, reviewForm, LocalDateTime.now())
-            .map(id => Created(Json.toJson(id)))
+          reviewForm => sessionDao.getReviewForSession(sessionId).flatMap {
+            case Some(review) => Future.successful(Ok(Json.toJson(review)))
+            case None => sessionDao.createReview(request.credentials.id, sessionId, reviewForm, LocalDateTime.now())
+              .map(id => Ok(Json.toJson(id)))
+          }
         )
       case _ => Future.successful(BadRequest(Json.obj("error" -> "Invalid request.")))
     }
