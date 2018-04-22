@@ -45,7 +45,7 @@ POST          /sessions/:sid/reports             controllers.SessionController.c
 GET           /sessions/:sid/files               controllers.SessionController.getFiles(sid: Long)
 POST          /sessions/:sid/files               controllers.SessionController.createFiles(sid: Long)
 
-GET           /sessions/:sid/reviews             controllers.SessionController.getReviews(sid: Long)
+GET           /sessions/:sid/reviews             controllers.SessionController.getReview(sid: Long)
 POST          /sessions/:sid/reviews             controllers.SessionController.createReview(sid: Long)
 PUT           /sessions/:sid/reviews/:rid        controllers.SessionController.updateReview(sid: Long, rid: Long)
 DELETE        /sessions/:sid/reviews/:rid        controllers.SessionController.removeReview(sid: Long, rid: Long)

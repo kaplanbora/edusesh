@@ -87,6 +87,11 @@ class SessionController @Inject()(
     }
   }
 
+  def getReview(sessionId: Long) = authAction.async { implicit request =>
+    sessionDao.getReviewForSession(sessionId)
+      .map(review => Ok(Json.toJson(review)))
+  }
+
   def createReview(sessionId: Long) = authAction(parse.json).async { implicit request =>
     sessionDao.getSession(sessionId).flatMap {
       case Some(s) if (s.instructorId == request.credentials.id || s.traineeId == request.credentials.id) && s.isCompleted =>

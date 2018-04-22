@@ -125,8 +125,8 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
       .result
   }
 
-  def getReviewForSession(traineeId: Long, sessionId: Long): Future[Option[Review]] = db.run {
-    reviews.filter(review => review.traineeId === traineeId && review.sessionId === sessionId)
+  def getReviewForSession(sessionId: Long): Future[Option[Review]] = db.run {
+    reviews.filter(review => review.sessionId === sessionId)
       .result
       .headOption
   }
@@ -142,8 +142,12 @@ class SessionDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvide
   }
 
   def createReview(traineeId: Long, sessionId: Long, form: ReviewForm, date: LocalDateTime): Future[Long] = db.run {
-    (reviews returning reviews.map(_.id)) +=
-      Review(-1, sessionId, traineeId, form.rating, form.title, form.comment, date)
+    reviews.filter(_.sessionId === sessionId).result.headOption.map {
+      case Some(review) => review.id
+      case None => 
+        (reviews returning reviews.map(_.id)) +=
+          Review(-1, sessionId, traineeId, form.rating, form.title, form.comment, date)
+    }
   }
 
   def createSessionFile(sessionId: Long, form: SessionFileForm, date: LocalDateTime): Future[Long] = db.run {
