@@ -19,6 +19,7 @@ class UserController @Inject()(
     chatDao: ChatDAO,
     userDao: UserDAO,
     sessionDao: SessionDAO,
+    topicDao: TopicDAO,
     instructorAction: InstructorAction,
     traineeAction: TraineeAction,
     authAction: AuthenticatedAction,
@@ -26,6 +27,7 @@ class UserController @Inject()(
 )(implicit ec: ExecutionContext) extends AbstractController(cc) {
 
   def currentTime = LocalDateTime.now()
+
 
   def login = Action(parse.json).async { implicit request =>
     request.body.validate[UserCredentialsForm].fold(
@@ -135,6 +137,51 @@ class UserController @Inject()(
           case _ => true
         })))
     })
+  }
+
+  def average(s: Seq[Double]): Double = {
+    val len = s.length
+    s.sum / len
+  }
+
+  def mkName(first: Option[String], last: Option[String]): String =
+    first -> last match {
+      case (Some(f), Some(l)) => s"$f $l"
+      case _ => ""
+    }
+
+  case class SearchResult(userId: Long, name: String, hourlyRate: Double, occupation: String, rating: Double, sessionCount: Int)
+
+  implicit val searchResultFormat = Json.format[SearchResult]
+
+  def mkSearchResult(instructorProfile: Option[InstructorProfile]): Future[Option[SearchResult]] =
+    instructorProfile match {
+      case Some(profile) =>
+        for {
+          sessions <- sessionDao.getSessionsForUser(profile.userId).map(_.filter(_.isCompleted))
+          ratings <- sessionDao.getReviewsForInstructor(profile.userId).map(_.map(_.rating))
+        } yield Some(
+          SearchResult(
+            profile.userId,
+            mkName(profile.firstName, profile.lastName),
+            profile.hourlyRate,
+            profile.occupation.getOrElse("Unemployed"),
+            average(ratings),
+            sessions.length)
+        )
+      case None => Future.successful(None)
+    }
+
+  def search(category: String, query: Option[String]) = Action.async { implicit request =>
+    category match {
+      case "topic" =>
+        topicDao.getInstructorIdsForTopic(query.getOrElse("")).flatMap(instructorIds => {
+          val searchResults = instructorIds.map(id => {
+            userDao.getInstructorProfile(id).flatMap(mkSearchResult)
+          })
+          Future.sequence(searchResults).map(results => Ok(Json.toJson(results)))
+        })
+    }
   }
 
   def getSelfCredentials = authAction.async { implicit request =>

@@ -51,15 +51,20 @@ class TopicDAO @Inject()(dbConfigProvider: DatabaseConfigProvider)(implicit ec: 
     userTopicTable.result
   }
 
+  def getInstructorIdsForTopic(topic: String): Future[Seq[Long]] = db.run {
+    val ids = userTopicTable.filter(_.name === topic.toLowerCase).map(_.id)
+    instructorTopicTable.filter(_.topicId in ids).map(_.instructorId).result
+  }
+
   def getUserTopic(name: String): Future[Option[UserTopic]] = db.run {
-    userTopicTable.filter(_.name === name)
+    userTopicTable.filter(_.name === name.toLowerCase)
       .result
       .headOption
   }
 
   def createUserTopic(form: UserTopicForm): Future[Long] = db.run {
     (userTopicTable returning userTopicTable.map(_.id)) +=
-      UserTopic(-1, form.name, form.parentId)
+      UserTopic(-1, form.name.toLowerCase, form.parentId)
   }
 
   def addInstructorTopic(instructorId: Long, topicId: Long): Future[Long] = db.run {
