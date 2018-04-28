@@ -63,6 +63,10 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     userCredentials.result
   }
 
+  def listInstructorProfiles: Future[Seq[InstructorProfile]] = db.run {
+    instructorProfiles.result
+  }
+
   def instructorQueryConsume(instructorIds: Query[Rep[Long], Long, Seq]): Future[Seq[InstructorProfile]] = db.run  {
     instructorProfiles.filter(_.userId in instructorIds).result
   }

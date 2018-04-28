@@ -122,11 +122,6 @@ class UserController @Inject()(
     }
   }
 
-  //  def getConversations = authAction.async { implicit request =>
-  //    chatDao.getConversationsForUser(request.credentials.id)
-  //      .map(convs => Ok(Json.toJson(convs)))
-  //  }
-
   // If a user deleted this conversation don't send the conversation to them
   def getConversations = authAction.async { implicit request =>
     chatDao.getConversationsForUser(request.credentials.id).map(conversations => {
@@ -141,7 +136,7 @@ class UserController @Inject()(
 
   def average(s: Seq[Double]): Double = {
     val len = s.length
-    s.sum / len
+    if (len > 0) s.sum / len else 0
   }
 
   def mkName(first: Option[String], last: Option[String]): String =
@@ -173,14 +168,20 @@ class UserController @Inject()(
     }
 
   def search(category: String, query: Option[String]) = Action.async { implicit request =>
-    category match {
-      case "topic" =>
-        topicDao.getInstructorIdsForTopic(query.getOrElse("")).flatMap(instructorIds => {
+    (category, query) match {
+      case ("topic", Some(q)) =>
+        topicDao.getInstructorIdsForTopic(q).flatMap(instructorIds => {
           val searchResults = instructorIds.map(id => {
             userDao.getInstructorProfile(id).flatMap(mkSearchResult)
           })
           Future.sequence(searchResults).map(results => Ok(Json.toJson(results)))
         })
+      case _ =>
+        userDao.listInstructorProfiles
+          .flatMap(instructors => {
+            val searchResults = instructors.map(instructor => mkSearchResult(Some(instructor)))
+            Future.sequence(searchResults).map(results => Ok(Json.toJson(results)))         
+          })
     }
   }
 
