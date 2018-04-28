@@ -176,6 +176,12 @@ class UserController @Inject()(
           })
           Future.sequence(searchResults).map(results => Ok(Json.toJson(results)))
         })
+      case ("instructor", Some(q)) =>
+        userDao.getInstructorsByName(q)
+          .flatMap(instructors => {
+            val searchResults = instructors.map(instructor => mkSearchResult(Some(instructor)))
+            Future.sequence(searchResults).map(results => Ok(Json.toJson(results)))
+          })
       case _ =>
         userDao.listInstructorProfiles
           .flatMap(instructors => {

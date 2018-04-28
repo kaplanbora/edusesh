@@ -67,7 +67,14 @@ class UserDAO @Inject()(protected val dbConfigProvider: DatabaseConfigProvider)(
     instructorProfiles.result
   }
 
-  def instructorQueryConsume(instructorIds: Query[Rep[Long], Long, Seq]): Future[Seq[InstructorProfile]] = db.run  {
+  def getInstructorsByName(query: String): Future[Seq[InstructorProfile]] = db.run {
+    instructorProfiles.filter(i =>
+      i.firstName.toLowerCase.like(s"%${query.toLowerCase}%") ||
+        i.lastName.toLowerCase.like(s"%${query.toLowerCase}%")
+    ).result
+  }
+
+  def instructorQueryConsume(instructorIds: Query[Rep[Long], Long, Seq]): Future[Seq[InstructorProfile]] = db.run {
     instructorProfiles.filter(_.userId in instructorIds).result
   }
 
