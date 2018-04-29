@@ -122,6 +122,11 @@ class UserController @Inject()(
     }
   }
 
+  def getReviewsFor(id: Long) = Action.async { implicit request => 
+    sessionDao.getReviewsForInstructor(id)
+      .map(reviews => Ok(Json.toJson(reviews)))
+  }
+
   // If a user deleted this conversation don't send the conversation to them
   def getConversations = authAction.async { implicit request =>
     chatDao.getConversationsForUser(request.credentials.id).map(conversations => {

@@ -15,6 +15,7 @@ GET           /users/topics                      controllers.TopicController.get
 
 GET           /users/:id/credentials             controllers.UserController.getCredentials(id: Long)
 GET           /users/:id/profile                 controllers.UserController.getProfile(id: Long)
+GET           /users/:id/reviews                 controllers.UserController.getReviewsFor(id: Long)
 GET           /users/:id/topics                  controllers.TopicController.getInstructorTopics(id: Long)
 
 POST          /users/login                       controllers.UserController.login
