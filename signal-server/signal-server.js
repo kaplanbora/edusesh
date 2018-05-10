@@ -64,15 +64,19 @@ wsServer.on("request", (request) => {
     if (data.type !== 'utf8') {
       return;
     }
-    const message = JSON.parse(data.utf8Data);       
+    const message = JSON.parse(data.utf8Data);
     //connections.forEach(socket => console.log(`[RECEIVED-BEFORE] - Type: ${message.type} Owner: ${socket.owner} Target: ${socket.target} Session: ${socket.session}`));
     //sessions.forEach(s => console.log(`[SESSIONS-BEFORE] - ID:${s.id} InstructorReady:${s.instructorReady} TraineeReady: ${s.traineeReady}`));
     switch (message.type) {
-	  case "end-session":
-		const answer = {type: "hang-up"};
-		sendToTarget(socket.owner, answer, socket.target);
-		sendToTarget(socket.target, answer, socket.answer);
-		break;
+      case "end-session":
+        const answer = {type: "hang-up"};
+        sendToTarget(socket.owner, answer, socket.target);
+        sendToTarget(socket.target, answer, socket.answer);
+        const sesh = sessions.filter(session => session.id == message.payload)[0];
+        if (sesh) {
+          sesh.isComplete = true;
+        }
+        break;
       case "initiate":
         socket.owner = message.payload.owner;
         socket.target = message.payload.target;
@@ -85,6 +89,7 @@ wsServer.on("request", (request) => {
             instructorReady: false,
             traineeReady: false,
             startDate: null,
+            isComplete: false,
             instructorPresent: socket.role === "instructor",
             traineePresent: socket.role === "trainee"
           });
@@ -96,7 +101,7 @@ wsServer.on("request", (request) => {
             session.traineePresent = true;
           }
 
-          if (session.instructorPresent && session.traineePresent && session.startDate) {
+          if (session.instructorPresent && session.traineePresent && session.startDate && !session.isComplete) {
             const message = {
               type: "start_session",
               payload: new Date()
